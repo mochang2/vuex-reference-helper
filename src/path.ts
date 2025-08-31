@@ -4,8 +4,63 @@ import type { PathConfig } from "./types";
 
 let pathConfig: PathConfig | null = null;
 
-// to resolve module paths
+// resolve module paths
 export async function loadPathConfiguration(): Promise<void> {
+  async function resolveConfig(fileUri: vscode.Uri): Promise<any | null> {
+    try {
+      const fileContent = await vscode.workspace.fs.readFile(fileUri);
+      return JSON.parse(new TextDecoder().decode(fileContent));
+    } catch (error) {
+      console.error("Error reading config file:", fileUri.fsPath, error);
+      return null;
+    }
+  }
+
+  async function findCompilerOptions(
+    fileUri: vscode.Uri,
+    visited = new Set<string>() // prevent circular reference
+  ): Promise<Omit<PathConfig, "type"> | null> {
+    if (visited.has(fileUri.fsPath)) {
+      return null;
+    }
+    visited.add(fileUri.fsPath);
+
+    const config = await resolveConfig(fileUri);
+    if (!config) {
+      return null;
+    }
+
+    if (config.compilerOptions && config.compilerOptions.paths) {
+      const configDir = path.dirname(fileUri.fsPath);
+      const baseUrl = path.resolve(
+        configDir,
+        config.compilerOptions.baseUrl || "."
+      );
+      return {
+        baseUrl,
+        paths: config.compilerOptions.paths,
+      };
+    }
+
+    // search "references"
+    if (Array.isArray(config.references)) {
+      for (const ref of config.references) {
+        if (ref.path) {
+          const refPath = path.resolve(path.dirname(fileUri.fsPath), ref.path);
+          const refFile = vscode.Uri.file(
+            refPath.endsWith(".json") ? refPath : `${refPath}.json`
+          );
+          const result = await findCompilerOptions(refFile, visited);
+          if (result) {
+            return result;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   const configFiles = await vscode.workspace.findFiles(
     "{jsconfig,tsconfig}.json",
     "**/node_modules/**",
@@ -16,23 +71,15 @@ export async function loadPathConfiguration(): Promise<void> {
     return;
   }
 
-  // tsconfig.json firstly
-  const configFile =
-    configFiles.find((uri) => uri.fsPath.endsWith("tsconfig.json")) ||
-    configFiles[0];
+  const configFile = configFiles[0];
+  const type = configFile.fsPath.endsWith("tsconfig.json") ? "ts" : "js";
 
   try {
-    const fileContent = await vscode.workspace.fs.readFile(configFile);
-    const config = JSON.parse(new TextDecoder().decode(fileContent));
-    const compilerOptions = config.compilerOptions;
-
-    if (compilerOptions && compilerOptions.paths) {
-      const configDir = path.dirname(configFile.fsPath);
-      const baseUrl = path.resolve(configDir, compilerOptions.baseUrl || ".");
-
+    const result = await findCompilerOptions(configFiles[0]);
+    if (result) {
       pathConfig = {
-        baseUrl,
-        paths: compilerOptions.paths,
+        ...result,
+        type,
       };
     }
   } catch (error) {
@@ -46,7 +93,7 @@ export function resolveModuleUri(
 ): vscode.Uri | null {
   let resolvedPathWithoutExt: string | null = null;
 
-  // absolute path alias
+  // resolve path1 - if pathConfig exists
   if (pathConfig && pathConfig.paths) {
     for (const alias in pathConfig.paths) {
       const aliasPattern = alias.replace("*", ""); // e.g., '@/*' -> '@/'
@@ -66,7 +113,7 @@ export function resolveModuleUri(
     }
   }
 
-  // resolve path
+  // resolve path2 - if pathConfig not exists
   if (!resolvedPathWithoutExt) {
     if (importPath.startsWith(".") || path.isAbsolute(importPath)) {
       const baseDir = path.dirname(baseFileUri.fsPath);
@@ -78,24 +125,22 @@ export function resolveModuleUri(
   }
 
   // not barrel file
-  const possibleExtensions = [".js", ".ts"];
-  for (const ext of possibleExtensions) {
-    try {
-      const fullPath = resolvedPathWithoutExt + ext;
-      return vscode.Uri.file(fullPath);
-    } catch {
-      continue;
-    }
+  try {
+    const fullPath = `${resolvedPathWithoutExt}.${pathConfig?.type || "ts"}`; // tsconfig firstly
+    return vscode.Uri.file(fullPath);
+  } catch {
+    // do nothing
   }
 
   // barrel file
-  for (const ext of possibleExtensions) {
-    try {
-      const fullPath = path.join(resolvedPathWithoutExt, "index" + ext);
-      return vscode.Uri.file(fullPath);
-    } catch {
-      continue;
-    }
+  try {
+    const fullPath = path.join(
+      resolvedPathWithoutExt,
+      `index.${pathConfig?.type || "ts"}` // tsconfig firstly
+    );
+    return vscode.Uri.file(fullPath);
+  } catch {
+    // do nothing
   }
 
   return null;

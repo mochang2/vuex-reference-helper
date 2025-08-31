@@ -25,4 +25,5 @@ export type VuexEntity =
 export type PathConfig = {
   baseUrl: string;
   paths: Record<string, string[]>;
+  type: "ts" | "js";
 };
