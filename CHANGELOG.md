@@ -1,9 +1,16 @@
-# Change Log
+# Changelog
 
-All notable changes to the "vuex-reference-helper" extension will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.0.0] - 2025-08-31
 
-## [Unreleased]
+### Added
 
-- Initial release
+- Initial release of Vuex Reference Helper for VSCode.
+- Enabled Ctrl/Cmd+Click navigation to Vuex definitions:
+  - `state`
+  - `getters`
+  - `mutations`
+  - `modules`
+- Supports navigation across `.vue`, `.js`, and `.ts` files.
+- Handles path resolution using `tsconfig.json` / `jsconfig.json` aliases.
