@@ -2,7 +2,7 @@
   "name": "vuex-reference-helper",
   "displayName": "Vuex Reference Helper",
   "description": "VSCode extension that enables Ctrl/Cmd+Click navigation to Vuex state, getters, and mutations across .vue, .js, and .ts files with alias and path resolution support.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.102.0"
   },
@@ -52,5 +52,7 @@
     "@babel/parser": "^7.28.0",
     "@babel/traverse": "^7.28.0",
     "@vue/compiler-sfc": "^3.5.18"
-  }
+  },
+  "license": "MIT",
+  "repository": "github:mochang2/vuex-reference-helper"
 }
