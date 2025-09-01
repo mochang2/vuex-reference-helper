@@ -1,55 +1,59 @@
 import * as vscode from "vscode";
 import * as parser from "@babel/parser";
 import { parse } from "@vue/compiler-sfc";
-import type { File } from "@babel/types";
 import { TextDecoder } from "node:util";
+import type { AstResult } from "./types";
 
-const astCache = new Map<string, parser.ParseResult<File>>(); // prevent re-parsing of the same file
+const astCache = new Map<string, AstResult>(); // prevent re-parsing of the same file
 
-function extractScriptFromVue(code: string): string | null {
+function extractScriptFromVue(code: string): { content: string, startLine: number } | null {
   const { descriptor } = parse(code);
+  const script = descriptor.script || descriptor.scriptSetup; // // <script> block || <script setup> block
 
-  if (descriptor.script) {
-    // <script> block
-    return descriptor.script.content;
-  }
-  if (descriptor.scriptSetup) {
-    // <script setup> block
-    return descriptor.scriptSetup.content;
+  if (script) {
+    return {
+      content: script.content,
+      startLine: script.loc.start.line - 1,
+    };
   }
 
   return null;
 }
 
-export async function getAst(file: vscode.Uri) {
+export async function getAst(file: vscode.Uri): Promise<AstResult | null> {
   const fileUriString = file.toString();
   if (astCache.has(fileUriString)) {
-    return astCache.get(fileUriString);
+    return astCache.get(fileUriString) as AstResult;
   }
 
   try {
     const fileContent: Uint8Array = await vscode.workspace.fs.readFile(file);
-    let code: string = new TextDecoder().decode(fileContent);
+    const fullCode: string = new TextDecoder().decode(fileContent);
+
+    let codeToParse = fullCode;
+    let scriptStartLine = 0; // 0 if not a vue file
 
     // extract script content if the file is a Vue file
     if (file.fsPath.endsWith(".vue")) {
-      const scriptContent = extractScriptFromVue(code);
-      if (!scriptContent) {
+      const scriptInfo = extractScriptFromVue(fullCode);
+      if (!scriptInfo) {
         console.error(`No script tag found in Vue file: ${file.fsPath}`);
         return null;
       }
-      code = scriptContent;
+      codeToParse = scriptInfo.content;
+      scriptStartLine = scriptInfo.startLine;
     }
 
-    const ast = parser.parse(code, {
+    const ast = parser.parse(codeToParse, {
       sourceType: "module", // use es module system
       plugins: ["typescript"],
       errorRecovery: true, // ignore minor syntax errors
     });
 
-    astCache.set(fileUriString, ast);
+    const result = { ast, scriptStartLine };
+    astCache.set(fileUriString, result);
 
-    return ast;
+    return result;
   } catch (error) {
     console.error(`Error parsing AST for ${file.fsPath}`, error);
     return null; // return null if file reading or parsing fails

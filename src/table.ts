@@ -17,8 +17,8 @@ export async function buildSymbolTable(): Promise<void> {
   async function checkIfVuexEntry(
     file: vscode.Uri
   ): Promise<[true, string] | [false, null]> {
-    const ast = await getAst(file);
-    if (!ast) {
+    const astResult = await getAst(file);
+    if (!astResult) {
       return [false, null];
     }
 
@@ -26,7 +26,7 @@ export async function buildSymbolTable(): Promise<void> {
     let createStoreLocalName: string | null = null; // in case of import { createStore as cs }, remember the imported function name
     let isCreateStoreCalled = false;
 
-    traverse(ast, {
+    traverse(astResult.ast, {
       ImportDeclaration(path) {
         // find import statement of createStore like "import { createStore } from 'vuex'"
         if (path.node.source.value === "vuex") {
@@ -239,14 +239,14 @@ export async function buildSymbolTable(): Promise<void> {
             continue;
           }
 
-          const moduleAst = await getAst(moduleFileUri);
-          if (!moduleAst) {
+          const moduleAstResult = await getAst(moduleFileUri);
+          if (!moduleAstResult) {
             continue;
           }
 
           // module's exported object
           let moduleConfigObject: ObjectExpression | null = null;
-          traverse(moduleAst, {
+          traverse(moduleAstResult.ast, {
             ExportNamedDeclaration(path: NodePath<ExportNamedDeclaration>) {
               const declaration = path.node.declaration;
               if (
@@ -289,7 +289,7 @@ export async function buildSymbolTable(): Promise<void> {
             const moduleResults = await parseModuleConfig(
               moduleConfigObject,
               moduleFileUri,
-              moduleAst,
+              moduleAstResult.ast,
               [...currentNamespaces, { name: moduleName, isNamespaced: null }]
             );
             results = results.concat(moduleResults);
@@ -315,8 +315,8 @@ export async function buildSymbolTable(): Promise<void> {
     return;
   }
 
-  const entryAst = await getAst(vuexEntryFile);
-  if (!entryAst) {
+  const entryAstResult = await getAst(vuexEntryFile);
+  if (!entryAstResult) {
     console.log("parsing vuex entry file failed");
     symbolTable = [];
 
@@ -324,7 +324,7 @@ export async function buildSymbolTable(): Promise<void> {
   }
 
   let rootConfigObject: ObjectExpression | null = null;
-  traverse(entryAst, {
+  traverse(entryAstResult.ast, {
     CallExpression(path) {
       if (
         path.node.callee.type === "Identifier" &&
@@ -341,7 +341,7 @@ export async function buildSymbolTable(): Promise<void> {
     symbolTable = await parseModuleConfig(
       rootConfigObject,
       vuexEntryFile,
-      entryAst,
+      entryAstResult.ast,
       []
     );
     console.log("Symbol Table Built:", symbolTable);

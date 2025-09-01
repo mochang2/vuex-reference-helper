@@ -36,8 +36,8 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     document: vscode.TextDocument,
     position: vscode.Position
   ): Promise<vscode.Definition | vscode.LocationLink[] | null> {
-    const ast = await getAst(document.uri);
-    if (!ast) {
+    const astResult = await getAst(document.uri);
+    if (!astResult) {
       return null;
     }
 
@@ -52,7 +52,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     let storeLocalName: string | null = null; // in case of, const s = useStore() or const store = useStore(), remember the name of the variable
     let targetNodePath: any = null; // the smallest ast node
 
-    traverse(ast, {
+    traverse(astResult.ast, {
       ImportDeclaration(path) {
         if (path.node.source.value === "vuex") {
           for (const specifier of path.node.specifiers) {
@@ -75,7 +75,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       return null;
     }
 
-    traverse(ast, {
+    traverse(astResult.ast, {
       CallExpression(path) {
         if (
           path.node.callee.type === "Identifier" &&
@@ -95,14 +95,14 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       return null;
     }
 
-    traverse(ast, {
+    traverse(astResult.ast, {
       enter(path) {
         const node = path.node;
         if (!node.loc) {
           return;
         }
 
-        const cursorLine = position.line + 1;
+        const cursorLine = (position.line - astResult.scriptStartLine) + 1;
         const cursorChar = position.character;
 
         if (

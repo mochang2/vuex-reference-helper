@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import * as parser from "@babel/parser";
+import type { File } from "@babel/types";
 
 export type VuexProperty =
   | "state"
@@ -26,4 +28,9 @@ export type PathConfig = {
   baseUrl: string;
   paths: Record<string, string[]>;
   type: "ts" | "js";
+};
+
+export type AstResult = { 
+  ast: parser.ParseResult<File>, 
+  scriptStartLine: number 
 };
