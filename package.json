@@ -3,6 +3,7 @@
   "displayName": "Vuex Reference Helper",
   "description": "VSCode extension that enables Ctrl/Cmd+Click navigation to Vuex state, getters, and mutations across .vue, .js, and .ts files with alias and path resolution support.",
   "version": "1.0.1",
+  "publisher": "qjsrodksro",
   "engines": {
     "vscode": "^1.102.0"
   },
