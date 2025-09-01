@@ -14,3 +14,10 @@ All notable changes to this project will be documented in this file.
   - `modules`
 - Supports navigation across `.vue`, `.js`, and `.ts` files.
 - Handles path resolution using `tsconfig.json` / `jsconfig.json` aliases.
+
+## [1.0.1] - 2025-09-01
+
+### Fixed
+
+- Remove ast cache while a document is changed(prevent to reload vscode to update ast cache).
+- Change `.vue` files to function normally even if it does not start with a script tag.
