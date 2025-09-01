@@ -56,7 +56,13 @@ export async function getAst(file: vscode.Uri) {
   }
 }
 
-// TODO: cache clear 언제 추가로 할지 고민
+export function removeAst(file: vscode.Uri): void {
+  const fileUriString = file.toString();
+  if (astCache.has(fileUriString)) {
+    astCache.delete(fileUriString);
+  }
+}
+
 export function clearAst(): void {
   astCache.clear();
 }
