@@ -25,10 +25,12 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(provider);
 
   // if a file is changed, remove it from the cache
-  const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument((event) => {
-    console.log(`cache remove for: ${event.document.uri}`);
-    removeAst(event.document.uri);
-  });
+  const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(
+    (event) => {
+      console.log(`cache remove for: ${event.document.uri}`);
+      removeAst(event.document.uri);
+    }
+  );
   context.subscriptions.push(onDidChangeTextDocument);
 }
 

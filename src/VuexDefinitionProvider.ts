@@ -102,7 +102,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
           return;
         }
 
-        const cursorLine = (position.line - astResult.scriptStartLine) + 1;
+        const cursorLine = position.line - astResult.scriptStartLine + 1;
         const cursorChar = position.character;
 
         if (

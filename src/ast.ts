@@ -6,7 +6,9 @@ import type { AstResult } from "./types";
 
 const astCache = new Map<string, AstResult>(); // prevent re-parsing of the same file
 
-function extractScriptFromVue(code: string): { content: string, startLine: number } | null {
+function extractScriptFromVue(
+  code: string
+): { content: string; startLine: number } | null {
   const { descriptor } = parse(code);
   const script = descriptor.script || descriptor.scriptSetup; // // <script> block || <script setup> block
 

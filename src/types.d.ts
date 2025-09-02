@@ -30,7 +30,7 @@ export type PathConfig = {
   type: "ts" | "js";
 };
 
-export type AstResult = { 
-  ast: parser.ParseResult<File>, 
-  scriptStartLine: number 
+export type AstResult = {
+  ast: parser.ParseResult<File>;
+  scriptStartLine: number;
 };
