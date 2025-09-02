@@ -123,19 +123,18 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       return null;
     }
 
-    // store.commit("mutation") or store.getters["getter"] or store.commit("module/mutation") or store.getters["module/getter"] (using parentheses)
+    // store.dispatch("action") or store.commit("mutation") or store.getters["getter"] or store.dispatch("module/action") or store.commit("module/mutation") or store.getters["module/getter"] (using parentheses)
     // => locate to a mutation declaration or a getter declaration
     if (targetNodePath.node.type === "StringLiteral") {
       const parent = targetNodePath.parent;
 
-      if (
-        parent.type === "CallExpression" &&
-        parent.callee.type === "MemberExpression" &&
-        parent.callee.object.type === "Identifier" &&
-        parent.callee.object.name === storeLocalName &&
-        parent.callee.property.type === "Identifier" &&
-        parent.callee.property.name === "commit"
-      ) {
+      const isMutationCall = parent.type === "CallExpression"
+        && parent.callee.type === "MemberExpression"
+        && parent.callee.object.type === "Identifier"
+        && parent.callee.object.name === storeLocalName
+        && parent.callee.property.type === "Identifier"
+        && parent.callee.property.name === "commit";
+      if (isMutationCall) {
         const entity =
           querySymbolTable(word, "modules") ||
           querySymbolTable(targetNodePath.node.value, "mutations");
@@ -144,15 +143,29 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
         }
       }
 
-      if (
-        parent.type === "MemberExpression" &&
-        parent.computed === true &&
-        parent.object.type === "MemberExpression" &&
-        parent.object.object.type === "Identifier" &&
-        parent.object.object.name === storeLocalName &&
-        parent.object.property.type === "Identifier" &&
-        parent.object.property.name === "getters"
-      ) {
+      const isActionCall = parent.type === "CallExpression"
+        && parent.callee.type === "MemberExpression"
+        && parent.callee.object.type === "Identifier"
+        && parent.callee.object.name === storeLocalName
+        && parent.callee.property.type === "Identifier"
+        && parent.callee.property.name === "dispatch";
+      if (isActionCall) {
+        const entity =
+          querySymbolTable(word, "modules") ||
+          querySymbolTable(targetNodePath.node.value, "actions");
+        if (entity) {
+          return new vscode.Location(entity.fileUri, entity.position);
+        }
+      }
+
+      const isGetterCall = parent.type === "MemberExpression"
+        && parent.computed === true
+        && parent.object.type === "MemberExpression"
+        && parent.object.object.type === "Identifier"
+        && parent.object.object.name === storeLocalName
+        && parent.object.property.type === "Identifier"
+        && parent.object.property.name === "getters";
+      if (isGetterCall) {
         const entity =
           querySymbolTable(word, "modules") ||
           querySymbolTable(targetNodePath.node.value, "getters");

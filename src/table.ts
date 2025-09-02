@@ -116,7 +116,7 @@ export async function buildSymbolTable(): Promise<void> {
 
     function collectProperties(
       obj: ObjectExpression,
-      vuexType: "getters" | "mutations",
+      vuexType: "getters" | "mutations" | "actions",
       pathStack: string[]
     ) {
       for (const member of obj.properties) {
@@ -191,7 +191,7 @@ export async function buildSymbolTable(): Promise<void> {
           value,
           currentNamespaces.map(({ name }) => name)
         );
-      } else if (vuexType === "getters" || vuexType === "mutations") {
+      } else if (vuexType === "getters" || vuexType === "mutations" || vuexType === "actions") {
         collectProperties(
           value,
           vuexType,

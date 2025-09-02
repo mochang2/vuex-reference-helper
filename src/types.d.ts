@@ -3,11 +3,12 @@ import * as parser from "@babel/parser";
 import type { File } from "@babel/types";
 
 export type VuexProperty =
+  | "namespaced"
   | "state"
   | "getters"
+  | "actions"
   | "mutations"
-  | "modules"
-  | "namespaced";
+  | "modules";
 
 export type VuexEntity =
   | {
@@ -18,7 +19,7 @@ export type VuexEntity =
       pastNamespaces: { name: string; isNamespaced: boolean | null }[];
     }
   | {
-      type: "state" | "getters" | "mutations";
+      type: "state" | "getters" | "actions" | "mutations";
       name: string; // e.g. 'increment' or 'todo/getList'
       fileUri: vscode.Uri;
       position: vscode.Position;
@@ -30,7 +31,7 @@ export type PathConfig = {
   type: "ts" | "js";
 };
 
-export type AstResult = {
-  ast: parser.ParseResult<File>;
-  scriptStartLine: number;
+export type AstResult = { 
+  ast: parser.ParseResult<File>, 
+  scriptStartLine: number 
 };
