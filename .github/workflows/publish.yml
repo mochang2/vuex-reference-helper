@@ -1,36 +1,45 @@
 name: Publish Extension
 
 on:
-  workflow_dispatch: # 👈 수동 실행 전용 트리거
+  workflow_dispatch: # execute manually
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 저장소 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Node.js 세팅
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3. 의존성 설치
       - name: Install dependencies
         run: npm ci
 
-      # 4. vsce / ovsx 설치
       - name: Install VSCE and OVSX
         run: npm install -g @vscode/vsce ovsx
 
-      # 5. Publish 실행
       - name: Publish to VS Code Marketplace & Open VSX
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
-          chmod +x ./publish.sh
-          ./publish.sh
+          set -e
+          EXT_NAME="vuex-reference-helper"
+          VERSION=$(node -p "require('./package.json').version")
+
+          echo "📦 Packaging extension v$VERSION..."
+          vsce package
+
+          VSIX_FILE="$EXT_NAME-$VERSION.vsix"
+
+          echo "🚀 Publishing to VS Code Marketplace..."
+          vsce publish -p $VSCE_PAT
+
+          echo "🌍 Publishing to Open VSX..."
+          ovsx publish "$VSIX_FILE" -p $OVSX_PAT
+
+          echo "✅ Done! Published $EXT_NAME v$VERSION to both VS Code Marketplace and Open VSX."
