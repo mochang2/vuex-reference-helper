@@ -2,8 +2,13 @@ import * as vscode from "vscode";
 import traverse from "@babel/traverse";
 import { querySymbolTable } from "./table";
 import { getAst } from "./ast";
-import type { Node } from "@babel/traverse";
-import type { Ast, StoreContext, TargetNodeInfo } from "./types";
+import type { Node, NodePath } from "@babel/traverse";
+import type {
+  VuexModuleEntity,
+  Ast,
+  StoreContext,
+  TargetNodeInfo,
+} from "./types";
 
 export class VuexDefinitionProvider implements vscode.DefinitionProvider {
   // handle in case that white spaces are included, such as the below patterns
@@ -22,7 +27,11 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     document: vscode.TextDocument,
     position: vscode.Position
   ): Promise<vscode.Definition | vscode.LocationLink[] | null> {
-    function findTargetNodePath(ast: Ast, position: vscode.Position, scriptStartLine: number): any {
+    function findTargetNodePath(
+      ast: Ast,
+      position: vscode.Position,
+      scriptStartLine: number
+    ): NodePath<Node> | null {
       function isNodeSmaller(nodeA: Node, nodeB: Node): boolean {
         if (!nodeA.loc || !nodeB.loc) {
           return false;
@@ -38,7 +47,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
         return sizeA < sizeB;
       }
 
-      let targetNodePath: any = null;
+      let targetNodePath: NodePath<Node> | null = null;
 
       traverse(ast, {
         enter(path) {
@@ -55,7 +64,8 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
             cursorLine <= node.loc.end.line &&
             (cursorLine > node.loc.start.line ||
               cursorChar >= node.loc.start.column) &&
-            (cursorLine < node.loc.end.line || cursorChar <= node.loc.end.column)
+            (cursorLine < node.loc.end.line ||
+              cursorChar <= node.loc.end.column)
           ) {
             if (!targetNodePath || isNodeSmaller(node, targetNodePath.node)) {
               targetNodePath = path;
@@ -112,7 +122,9 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       }
 
       const useStoreLocalName = findUseStoreLocalName();
-      const storeLocalName = useStoreLocalName ? findStoreLocalName(useStoreLocalName) : null;
+      const storeLocalName = useStoreLocalName
+        ? findStoreLocalName(useStoreLocalName)
+        : null;
 
       return {
         useStoreLocalName,
@@ -120,71 +132,196 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       };
     }
 
-    function handleStringLiteral(targetNodeInfo: TargetNodeInfo, storeLocalName: string | null): vscode.Location | null {
+    function handleStringLiteral(
+      targetNodeInfo: TargetNodeInfo,
+      storeLocalName: string | null
+    ): vscode.Location | null {
       function isMutationCall(parent: any): boolean {
-        return parent.type === "CallExpression"
-          && parent.callee.type === "MemberExpression"
-          && parent.callee.object.type === "Identifier"
-          && parent.callee.object.name === storeLocalName
-          && parent.callee.property.type === "Identifier"
-          && parent.callee.property.name === "commit";
+        return (
+          parent.type === "CallExpression" &&
+          parent.callee.type === "MemberExpression" &&
+          parent.callee.object.type === "Identifier" &&
+          parent.callee.object.name === storeLocalName &&
+          parent.callee.property.type === "Identifier" &&
+          parent.callee.property.name === "commit"
+        );
       }
 
       function isActionCall(parent: any): boolean {
-        return parent.type === "CallExpression"
-          && parent.callee.type === "MemberExpression"
-          && parent.callee.object.type === "Identifier"
-          && parent.callee.object.name === storeLocalName
-          && parent.callee.property.type === "Identifier"
-          && parent.callee.property.name === "dispatch";
+        return (
+          parent.type === "CallExpression" &&
+          parent.callee.type === "MemberExpression" &&
+          parent.callee.object.type === "Identifier" &&
+          parent.callee.object.name === storeLocalName &&
+          parent.callee.property.type === "Identifier" &&
+          parent.callee.property.name === "dispatch"
+        );
       }
 
       function isGetterCall(parent: any): boolean {
-        return parent.type === "MemberExpression"
-          && parent.computed === true
-          && parent.object.type === "MemberExpression"
-          && parent.object.object.type === "Identifier"
-          && parent.object.object.name === storeLocalName
-          && parent.object.property.type === "Identifier"
-          && parent.object.property.name === "getters";
+        return (
+          parent.type === "MemberExpression" &&
+          parent.computed === true &&
+          parent.object.type === "MemberExpression" &&
+          parent.object.object.type === "Identifier" &&
+          parent.object.object.name === storeLocalName &&
+          parent.object.property.type === "Identifier" &&
+          parent.object.property.name === "getters"
+        );
       }
 
-      const { node, parent, word } = targetNodeInfo;
+      function handleActionContextCall(
+        module: VuexModuleEntity
+      ): vscode.Location | null {
+        if (targetNodeInfo.parent.type !== "CallExpression") {
+          return null;
+        }
 
-      if (isMutationCall(parent)) {
-        const entity = querySymbolTable(word, "modules") || querySymbolTable(node.value, "mutations");
+        const functionParent = targetNodeInfo.path.getFunctionParent();
+        if (!functionParent) {
+          return null;
+        }
+
+        let callName: "commit" | "dispatch" | null = null;
+
+        // in case of action({ dispatch }) or action({ commit }) - destructured
+        if (targetNodeInfo.parent.callee.type === "Identifier") {
+          callName = targetNodeInfo.parent.callee.name as "commit" | "dispatch";
+        }
+        // in case of action(context) { context.commit('...') } or action(a) { a.dispatch('...') } - not destructured
+        else if (
+          targetNodeInfo.parent.callee.type === "MemberExpression" &&
+          targetNodeInfo.parent.callee.object.type === "Identifier" &&
+          targetNodeInfo.parent.callee.property.type === "Identifier"
+        ) {
+          callName = targetNodeInfo.parent.callee.property.name as
+            | "commit"
+            | "dispatch";
+        }
+
+        if (!callName || (callName !== "commit" && callName !== "dispatch")) {
+          return null;
+        }
+
+        // check if the "actions" object is an ancestor
+        let currentPath = functionParent.parentPath;
+        let isInActionsContext = false;
+        let loopIterationGuard = 10; // prevent infinite loops
+        while (currentPath && loopIterationGuard > 0) {
+          if (
+            currentPath.node.type === "ObjectProperty" &&
+            currentPath.node.key.type === "Identifier" &&
+            currentPath.node.key.name === "actions"
+          ) {
+            isInActionsContext = true;
+            break;
+          }
+          if (!currentPath.parentPath) {
+            break;
+          }
+
+          currentPath = currentPath.parentPath;
+          loopIterationGuard--;
+        }
+
+        if (!isInActionsContext) {
+          return null;
+        }
+
+        const validNamespaces = module.pastNamespaces.filter(
+          ({ isNamespaced }) => isNamespaced
+        );
+        const name =
+          validNamespaces.length > 0
+            ? `${validNamespaces.map(({ name }) => name).join("/")}/${
+                targetNodeInfo.word
+              }`
+            : targetNodeInfo.word;
+        const type = callName === "commit" ? "mutations" : "actions";
+        const entity = querySymbolTable(
+          (symbol) => symbol.name === name && symbol.type === type
+        );
         if (entity) {
           return new vscode.Location(entity.fileUri, entity.position);
         }
+
+        return null;
       }
 
-      if (isActionCall(parent)) {
-        const entity = querySymbolTable(word, "modules") || querySymbolTable(node.value, "actions");
-        if (entity) {
-          return new vscode.Location(entity.fileUri, entity.position);
+      if (storeLocalName) {
+        if (isMutationCall(targetNodeInfo.parent)) {
+          const entity =
+            querySymbolTable(
+              (symbol) =>
+                symbol.name === targetNodeInfo.word && symbol.type === "modules"
+            ) ||
+            querySymbolTable(
+              (symbol) =>
+                symbol.name === targetNodeInfo.node.value &&
+                symbol.type === "mutations"
+            );
+          if (entity) {
+            return new vscode.Location(entity.fileUri, entity.position);
+          }
+        }
+
+        if (isActionCall(targetNodeInfo.parent)) {
+          const entity =
+            querySymbolTable(
+              (symbol) =>
+                symbol.name === targetNodeInfo.word && symbol.type === "modules"
+            ) ||
+            querySymbolTable(
+              (symbol) =>
+                symbol.name === targetNodeInfo.node.value &&
+                symbol.type === "actions"
+            );
+          if (entity) {
+            return new vscode.Location(entity.fileUri, entity.position);
+          }
+        }
+
+        if (isGetterCall(targetNodeInfo.parent)) {
+          const entity =
+            querySymbolTable(
+              (symbol) =>
+                symbol.name === targetNodeInfo.word && symbol.type === "modules"
+            ) ||
+            querySymbolTable(
+              (symbol) =>
+                symbol.name === targetNodeInfo.node.value &&
+                symbol.type === "getters"
+            );
+          if (entity) {
+            return new vscode.Location(entity.fileUri, entity.position);
+          }
         }
       }
 
-      if (isGetterCall(parent)) {
-        const entity = querySymbolTable(word, "modules") || querySymbolTable(node.value, "getters");
-        if (entity) {
-          return new vscode.Location(entity.fileUri, entity.position);
-        }
+      const module = querySymbolTable(
+        (symbol) =>
+          symbol.fileUri.path === document.uri.path && symbol.type === "modules"
+      ) as VuexModuleEntity;
+      if (module) {
+        // action -> mutation call or action -> action call
+        return handleActionContextCall(module);
       }
 
       return null;
     }
 
-    function handleIdentifier(targetNodeInfo: TargetNodeInfo, storeLocalName: string | null): vscode.Location | null {
+    function handleIdentifier(
+      targetNodeInfo: TargetNodeInfo,
+      storeLocalName: string | null
+    ): vscode.Location | null {
       function buildStatePath(): string {
-        const { node, parent, word } = targetNodeInfo;
-        let parts: string[] = [word];
-        let current = parent;
+        let parts: string[] = [targetNodeInfo.word];
+        let current = targetNodeInfo.parent;
 
         while (current && current.type === "MemberExpression") {
           if (
             current.property.type === "Identifier" &&
-            current.property !== node
+            current.property !== targetNodeInfo.node
           ) {
             if (
               current.property.name === storeLocalName ||
@@ -205,11 +342,97 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
         return parts.join(".");
       }
 
-      const statePath = buildStatePath();
-      const entity = querySymbolTable(statePath, "state");
-      
-      if (entity) {
-        return new vscode.Location(entity.fileUri, entity.position);
+      function handleModuleStateIdentifier(
+        module: VuexModuleEntity
+      ): vscode.Location | null {
+        const functionParentPath = targetNodeInfo.path.getFunctionParent();
+        if (!functionParentPath) {
+          return null;
+        }
+
+        const firstParam = functionParentPath.node.params[0];
+        if (!firstParam || firstParam.type !== "Identifier") {
+          return null;
+        }
+        const stateParamName = firstParam.name; // e.g., 'state', 'st', 's'
+
+        let currentPath = functionParentPath.parentPath;
+        let isInGettersOrMutationsContext = false;
+        let loopIterationGuard = 10; // prevent infinite loops
+        while (currentPath && loopIterationGuard > 0) {
+          if (
+            currentPath.node.type === "ObjectProperty" &&
+            currentPath.node.key.type === "Identifier" &&
+            (currentPath.node.key.name === "getters" ||
+              currentPath.node.key.name === "mutations")
+          ) {
+            isInGettersOrMutationsContext = true;
+            break;
+          }
+          if (!currentPath.parentPath) {
+            break;
+          }
+
+          currentPath = currentPath.parentPath;
+          loopIterationGuard--;
+        }
+
+        if (!isInGettersOrMutationsContext) {
+          return null;
+        }
+
+        let parts: string[] = [targetNodeInfo.word];
+        let current = targetNodeInfo.parent;
+        while (current && current.type === "MemberExpression") {
+          if (
+            current.property.type === "Identifier" &&
+            current.property !== targetNodeInfo.node
+          ) {
+            if (current.property.name === stateParamName) {
+              break;
+            }
+            parts.unshift(current.property.name);
+          }
+
+          current = current.object;
+        }
+
+        const validNamespaces = module.pastNamespaces.filter(
+          ({ isNamespaced }) => isNamespaced
+        );
+        const name =
+          validNamespaces.length > 0
+            ? `${validNamespaces.map(({ name }) => name).join(".")}.${
+                targetNodeInfo.word
+              }`
+            : targetNodeInfo.word;
+        const entity = querySymbolTable(
+          (symbol) => symbol.name === name && symbol.type === "state"
+        );
+        if (entity) {
+          return new vscode.Location(entity.fileUri, entity.position);
+        }
+
+        return null;
+      }
+
+      if (storeLocalName) {
+        const statePath = buildStatePath();
+        const entity = querySymbolTable(
+          (symbol) => symbol.name === statePath && symbol.type === "state"
+        );
+
+        if (entity) {
+          return new vscode.Location(entity.fileUri, entity.position);
+        }
+      }
+
+      const module = querySymbolTable(
+        (symbol) =>
+          symbol.fileUri.path === document.uri.path && symbol.type === "modules"
+      ) as VuexModuleEntity;
+      if (module) {
+        return handleModuleStateIdentifier(module);
       }
 
       return null;
@@ -217,11 +440,19 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
 
     function handleTextItself(word: string): vscode.Location | null {
       const entity =
-        querySymbolTable(word, "modules") ||
-        querySymbolTable(word, "getters") ||
-        querySymbolTable(word, "mutations") ||
-        querySymbolTable(word, "state");
-      
+        querySymbolTable(
+          (symbol) => symbol.name === word && symbol.type === "modules"
+        ) ||
+        querySymbolTable(
+          (symbol) => symbol.name === word && symbol.type === "getters"
+        ) ||
+        querySymbolTable(
+          (symbol) => symbol.name === word && symbol.type === "mutations"
+        ) ||
+        querySymbolTable(
+          (symbol) => symbol.name === word && symbol.type === "state"
+        );
+
       if (entity) {
         return new vscode.Location(entity.fileUri, entity.position);
       }
@@ -239,8 +470,12 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       return null;
     }
 
-    const targetNodePath = findTargetNodePath(astResult.ast, position, astResult.scriptStartLine); // the smallest ast node
-    if (!targetNodePath || !targetNodePath.node || !targetNodePath.parent) {
+    const targetNodePath = findTargetNodePath(
+      astResult.ast,
+      position,
+      astResult.scriptStartLine
+    ); // the smallest ast node
+    if (!targetNodePath) {
       return null;
     }
 
@@ -249,13 +484,17 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     const targetNodeInfo: TargetNodeInfo = {
       node: targetNodePath.node,
       parent: targetNodePath.parent,
+      path: targetNodePath,
       word,
     };
 
     // store.dispatch("action") or store.commit("mutation") or store.getters["getter"] or store.dispatch("module/action") or store.commit("module/mutation") or store.getters["module/getter"] (using parentheses)
     // => locate to a mutation declaration or a getter declaration
     if (targetNodePath.node.type === "StringLiteral") {
-      const result = handleStringLiteral(targetNodeInfo, storeContext.storeLocalName);
+      const result = handleStringLiteral(
+        targetNodeInfo,
+        storeContext.storeLocalName
+      );
       if (result) {
         return result;
       }
@@ -263,7 +502,10 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
 
     // store.state.object.state or state.state.module.state (nested state)
     if (targetNodePath.node.type === "Identifier") {
-      const result = handleIdentifier(targetNodeInfo, storeContext.storeLocalName);
+      const result = handleIdentifier(
+        targetNodeInfo,
+        storeContext.storeLocalName
+      );
       if (result) {
         return result;
       }

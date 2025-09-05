@@ -191,7 +191,11 @@ export async function buildSymbolTable(): Promise<void> {
           value,
           currentNamespaces.map(({ name }) => name)
         );
-      } else if (vuexType === "getters" || vuexType === "mutations" || vuexType === "actions") {
+      } else if (
+        vuexType === "getters" ||
+        vuexType === "mutations" ||
+        vuexType === "actions"
+      ) {
         collectProperties(
           value,
           vuexType,
@@ -346,13 +350,18 @@ export async function buildSymbolTable(): Promise<void> {
     );
     console.log("Symbol Table Built:", symbolTable);
   }
+  // vuex entry file
+  symbolTable.unshift({
+    type: "modules",
+    name: "", // no name
+    fileUri: vuexEntryFile,
+    position: new vscode.Position(0, 0), // no need to locate
+    pastNamespaces: [],
+  });
 }
 
 export function querySymbolTable(
-  name: string,
-  type: VuexProperty
+  condition: (symbol: VuexEntity) => boolean
 ): VuexEntity | undefined {
-  return symbolTable.find(
-    (symbol) => symbol.name === name && symbol.type === type
-  );
+  return symbolTable.find((symbol) => condition(symbol));
 }
