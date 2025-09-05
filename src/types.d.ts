@@ -31,7 +31,20 @@ export type PathConfig = {
   type: "ts" | "js";
 };
 
+export type Ast = parser.ParseResult<File>;
+
 export type AstResult = { 
-  ast: parser.ParseResult<File>, 
+  ast: Ast, 
   scriptStartLine: number 
 };
+
+export type StoreContext = {
+  useStoreLocalName: string | null;
+  storeLocalName: string | null;
+}
+
+export type TargetNodeInfo = {
+  node: any;
+  parent: any;
+  word: string;
+}
