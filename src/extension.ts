@@ -17,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
     { language: "javascript", scheme: "file" },
     { language: "typescript", scheme: "file" },
     { language: "vue", scheme: "file" },
+    { language: "plaintext", scheme: "file", pattern: "**/*.vue" }, // for test
   ];
   const provider = vscode.languages.registerDefinitionProvider(
     selector,
