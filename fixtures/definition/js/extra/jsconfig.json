@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "paths": {
+        "#store2": ["./src/store2/index"]
+      }
+    },
+    "exclude": ["node_modules", "dist"]
+}
+  
