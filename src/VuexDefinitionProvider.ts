@@ -325,8 +325,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
           ) {
             if (
               current.property.name === storeLocalName ||
-              current.property.name === "state" ||
-              current.property.name === "getters"
+              current.property.name === "state"
             ) {
               break;
             }
