@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2025-09-05
+## [2.0.0] - 2025.10.01
+
+### Changed
+
+- Supported VS code engine version
+  - `^1.102.0` -> `^1.99.0`
+
+### Fixed
+
+- Change the misleading of the `getters` to the definition of `state`, when the name of the `state` is same with the name of the `getters`
+
+## [1.1.0] - 2025.09.05
 
 ### Added
 
@@ -11,16 +22,16 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Supports navigating states, getters, mutations and actions within a store file
+- Support navigating states, getters, mutations and actions within a store file
 
-## [1.0.1] - 2025-09-01
+## [1.0.1] - 2025.09.01
 
 ### Fixed
 
 - Remove ast cache while a document is changed(prevent to reload vscode to update ast cache).
 - Change `.vue` files to function normally even if it does not start with a script tag.
 
-## [1.0.0] - 2025-08-31
+## [1.0.0] - 2025.08.31
 
 ### Added
 
@@ -30,5 +41,5 @@ All notable changes to this project will be documented in this file.
   - `getters`
   - `mutations`
   - `modules`
-- Supports navigation across `.vue`, `.js`, and `.ts` files.
-- Handles path resolution using `tsconfig.json` / `jsconfig.json` aliases.
+- Support navigation across `.vue`, `.js`, and `.ts` files.
+- Handle path resolution using `tsconfig.json` / `jsconfig.json` aliases.
