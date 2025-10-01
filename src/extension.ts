@@ -4,10 +4,10 @@ import { buildSymbolTable } from "./table";
 import { removeAst } from "./ast";
 
 // [TODO]
-// 4. cursor에도 올릴 수 있도록 수정
-// 5. 테스트 코드 작성. actions 추가해서 1.1.0 배포
-// 6. vuexEntryFile에 변경이 생길 때마다 반영될 수 있도록 1.1.1 수정해서 배포
-// 7. suggest 기능 추가해서 1.2.0 배포
+// 1. (1.1.1) 버그 픽스 => 테스트 코드 추가, store?.getters!. 이러한 경우에 대한 예외 처리 작업
+// 2. (1.2.0) vuexEntryFile에 변경이 생길 때마다 반영될 수 있도록 + path.ts file path resolve할 때 실제로 파일이 존재하는지 확인하는 작업
+// 3. (2.0.0) 제공 버전 수정(현재 최신 버전의 cursor가 1.7 대인데, vscode는 1.99 버전임)
+// 4. (2.1.0) suggest 기능 추가
 
 export function activate(context: vscode.ExtensionContext) {
   buildSymbolTable();
