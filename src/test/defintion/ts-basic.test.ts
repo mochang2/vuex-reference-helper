@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { waitForLoadingExtension } from "../utils.test";
 
-suite("js basic", () => {
+suite("ts basic", () => {
   suite("App.vue", () => {
     let workspaceRoot: string = "";
 
@@ -18,11 +18,11 @@ suite("js basic", () => {
     suiteSetup(() => {
       workspaceRoot = path.resolve(
         __dirname,
-        "../../../fixtures/definition/js/basic"
+        "../../../fixtures/definition/ts/basic"
       );
     });
 
-    test("Clicking 'getCount' of store.getters.getCount leads to a getter of index.js", async () => {
+    test("Clicking 'getCount' of store.getters.getCount leads to a getter of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -45,8 +45,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 20;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 32;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -65,7 +65,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'increment' of store.commit(\"increment\") leads to a mutation of index.js", async () => {
+    test("Clicking 'increment' of store.commit(\"increment\") leads to a mutation of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -88,8 +88,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 47;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 59;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -108,7 +108,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'incrementBy' of store.commit(\"incrementBy\") leads to a mutation of index.js", async () => {
+    test("Clicking 'incrementBy' of store.commit(\"incrementBy\") leads to a mutation of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -131,8 +131,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 50;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 62;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -151,7 +151,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'increment' of store.dispatch(\"increment\") leads to an action of index.js", async () => {
+    test("Clicking 'increment' of store.dispatch(\"increment\") leads to an action of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -174,8 +174,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 29;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 41;
       const expectedCharacter = 10;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -194,7 +194,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'incrementBy' of store.dispatch(\"incrementBy\") leads to an action of index.js", async () => {
+    test("Clicking 'incrementBy' of store.dispatch(\"incrementBy\") leads to an action of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -217,8 +217,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 37;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 49;
       const expectedCharacter = 10;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -237,7 +237,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'appDetail' of store.state.appDetail leads to a state of index.js", async () => {
+    test("Clicking 'appDetail' of store.state.appDetail leads to a state of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -258,8 +258,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 9;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 21;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -278,7 +278,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'setScrollPosition' of store.commit(\"setScrollPosition\") leads to a mutation of index.js", async () => {
+    test("Clicking 'setScrollPosition' of store.commit(\"setScrollPosition\") leads to a mutation of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -299,8 +299,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 53;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 65;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -319,7 +319,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'getAppDetail' of store.getters.getAppDetail.scrollPosition leads to a getter of index.js", async () => {
+    test("Clicking 'getAppDetail' of store.getters.getAppDetail.scrollPosition leads to a getter of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -345,8 +345,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 23;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 35;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -391,7 +391,7 @@ suite("js basic", () => {
       assert.ok(definitions.length === 0, "Definitions do not exist");
     });
 
-    test("Clicking 'abc' of store.state.abc leads to a state of index.js", async () => {
+    test("Clicking 'abc' of store.state.abc leads to a state of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -412,8 +412,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 17;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 29;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -432,7 +432,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'abc' of store.getters.abc leads to a getter of index.js", async () => {
+    test("Clicking 'abc' of store.getters.abc leads to a getter of index.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -455,8 +455,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-      const expectedLine = 26;
+      const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+      const expectedLine = 38;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -496,8 +496,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/popup.js");
-      const expectedLine = 0;
+      const expectedFile = path.join(workspaceRoot, "src/store/popup.ts");
+      const expectedLine = 4;
       const expectedCharacter = 15;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -516,7 +516,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'isOpen' of store.state.popup.isOpen leads to a state of popup.js", async () => {
+    test("Clicking 'isOpen' of store.state.popup.isOpen leads to a state of popup.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -539,8 +539,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/popup.js");
-      const expectedLine = 3;
+      const expectedFile = path.join(workspaceRoot, "src/store/popup.ts");
+      const expectedLine = 7;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -559,7 +559,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'getIsOpen' of store.getters[\"getIsOpen\"] leads to a getter of popup.js", async () => {
+    test("Clicking 'getIsOpen' of store.getters[\"getIsOpen\"] leads to a getter of popup.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -582,8 +582,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/popup.js");
-      const expectedLine = 6;
+      const expectedFile = path.join(workspaceRoot, "src/store/popup.ts");
+      const expectedLine = 10;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -602,7 +602,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'open' of store.commit(\"open\") leads to a mutation of popup.js", async () => {
+    test("Clicking 'open' of store.commit(\"open\") leads to a mutation of popup.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -625,8 +625,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/popup.js");
-      const expectedLine = 9;
+      const expectedFile = path.join(workspaceRoot, "src/store/popup.ts");
+      const expectedLine = 13;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -645,7 +645,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'close' of store.commit(\"close\") leads to a mutation of popup.js", async () => {
+    test("Clicking 'close' of store.commit(\"close\") leads to a mutation of popup.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -668,8 +668,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/popup.js");
-      const expectedLine = 12;
+      const expectedFile = path.join(workspaceRoot, "src/store/popup.ts");
+      const expectedLine = 16;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -709,8 +709,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -754,9 +754,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 2;
+      const expectedLine = 6;
       const expectedCharacter = 25;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -775,7 +775,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'isOpen' of store.state.myBanner.modal.isOpen leads to a state of modal.js", async () => {
+    test("Clicking 'isOpen' of store.state.myBanner.modal.isOpen leads to a state of modal.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -800,9 +800,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 5;
+      const expectedLine = 9;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -847,8 +847,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -895,9 +895,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 2;
+      const expectedLine = 6;
       const expectedCharacter = 25;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -916,7 +916,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'getIsOpen' of store.getters[\"myBanner/modal/getIsOpen\"] leads to a getter of modal.js", async () => {
+    test("Clicking 'getIsOpen' of store.getters[\"myBanner/modal/getIsOpen\"] leads to a getter of modal.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -944,9 +944,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 8;
+      const expectedLine = 12;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -988,8 +988,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1033,9 +1033,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 2;
+      const expectedLine = 6;
       const expectedCharacter = 25;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1054,7 +1054,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'open' of store.commit(\"myBanner/modal/open\") leads to a mutation of modal.js", async () => {
+    test("Clicking 'open' of store.commit(\"myBanner/modal/open\") leads to a mutation of modal.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1079,9 +1079,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 29;
+      const expectedLine = 33;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1123,8 +1123,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1168,9 +1168,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 2;
+      const expectedLine = 6;
       const expectedCharacter = 25;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1189,7 +1189,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'close' of store.commit(\"myBanner/modal/close\") leads to a mutation of modal.js", async () => {
+    test("Clicking 'close' of store.commit(\"myBanner/modal/close\") leads to a mutation of modal.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1214,9 +1214,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 32;
+      const expectedLine = 36;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1261,8 +1261,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1309,9 +1309,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 2;
+      const expectedLine = 6;
       const expectedCharacter = 25;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1330,7 +1330,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'open' of store.dispatch(\"myBanner/modal/open\") leads to an action of modal.js", async () => {
+    test("Clicking 'open' of store.dispatch(\"myBanner/modal/open\") leads to an action of modal.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1358,9 +1358,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 11;
+      const expectedLine = 15;
       const expectedCharacter = 10;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1405,8 +1405,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1453,9 +1453,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 2;
+      const expectedLine = 6;
       const expectedCharacter = 25;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1474,7 +1474,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'close' of store.dispatch(\"myBanner/modal/close\") leads to an action of modal.js", async () => {
+    test("Clicking 'close' of store.dispatch(\"myBanner/modal/close\") leads to an action of modal.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1502,9 +1502,9 @@ suite("js basic", () => {
       const definition = definitions[0];
       const expectedFile = path.join(
         workspaceRoot,
-        "src/store/modules/modal.js"
+        "src/store/modules/modal.ts"
       );
-      const expectedLine = 19;
+      const expectedLine = 23;
       const expectedCharacter = 10;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1524,12 +1524,12 @@ suite("js basic", () => {
     });
   });
 
-  suite("useBanner.js", () => {
+  suite("useBanner.ts", () => {
     let workspaceRoot: string = "";
 
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
-        path.join(workspaceRoot, "src/compositions/useBanner.js")
+        path.join(workspaceRoot, "src/compositions/useBanner.ts")
       );
 
       return vscode.workspace.openTextDocument(targetFileUri);
@@ -1538,7 +1538,7 @@ suite("js basic", () => {
     suiteSetup(() => {
       workspaceRoot = path.resolve(
         __dirname,
-        "../../../fixtures/definition/js/basic"
+        "../../../fixtures/definition/ts/basic"
       );
     });
 
@@ -1563,8 +1563,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1583,7 +1583,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'isOpen' of st.state.myBanner.isOpen leads to a state of banner.js", async () => {
+    test("Clicking 'isOpen' of st.state.myBanner.isOpen leads to a state of banner.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1606,8 +1606,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 7;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 11;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1647,8 +1647,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1667,7 +1667,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'getIsOpen' of st.getters[\"myBanner/getIsOpen\"] leads to a getter of banner.js", async () => {
+    test("Clicking 'getIsOpen' of st.getters[\"myBanner/getIsOpen\"] leads to a getter of banner.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1690,8 +1690,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 10;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 14;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1731,8 +1731,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1751,7 +1751,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'open' of st\n.commit(\n\"myBanner/open\"\n) leads to a mutation of banner.js", async () => {
+    test("Clicking 'open' of st\n.commit(\n\"myBanner/open\"\n) leads to a mutation of banner.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1759,7 +1759,7 @@ suite("js basic", () => {
       const searchString = '"myBanner/open"';
       const startIndex = document.getText().indexOf(searchString);
 
-      assert.ok(startIndex > -1, 'st\n.commit(\n"myBanner/open"\n) exists');
+      assert.ok(startIndex > -1, '"myBanner/open" exists');
 
       const position = document.positionAt(startIndex + '"myBanner/'.length); // position of "open"
 
@@ -1772,8 +1772,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 13;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 17;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1813,8 +1813,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 4;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
       const expectedCharacter = 22;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1833,7 +1833,7 @@ suite("js basic", () => {
       );
     });
 
-    test("Clicking 'close' of st.commit(\"myBanner/close\") leads to a mutation of banner.js", async () => {
+    test("Clicking 'close' of st.commit(\"myBanner/close\") leads to a mutation of banner.ts", async () => {
       // given
       await waitForLoadingExtension();
 
@@ -1856,8 +1856,8 @@ suite("js basic", () => {
       assert.ok(definitions.length > 0, "Definitions exist");
 
       const definition = definitions[0];
-      const expectedFile = path.join(workspaceRoot, "src/store/banner.js");
-      const expectedLine = 16;
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 20;
       const expectedCharacter = 4;
       assert.strictEqual(
         definition.uri.fsPath,
@@ -1877,12 +1877,12 @@ suite("js basic", () => {
     });
   });
 
-  suite("index.js", () => {
+  suite("index.ts", () => {
     let workspaceRoot: string = "";
 
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
-        path.join(workspaceRoot, "src/store/index.js")
+        path.join(workspaceRoot, "src/store/index.ts")
       );
 
       return vscode.workspace.openTextDocument(targetFileUri);
@@ -1891,7 +1891,7 @@ suite("js basic", () => {
     suiteSetup(() => {
       workspaceRoot = path.resolve(
         __dirname,
-        "../../../fixtures/definition/js/basic"
+        "../../../fixtures/definition/ts/basic"
       );
     });
 
@@ -1918,8 +1918,8 @@ suite("js basic", () => {
         assert.ok(definitions.length > 0, "Definitions exist");
 
         const definition = definitions[0];
-        const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-        const expectedLine = 37;
+        const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+        const expectedLine = 49;
         const expectedCharacter = 10;
         assert.strictEqual(
           definition.uri.fsPath,
@@ -1967,8 +1967,8 @@ suite("js basic", () => {
         assert.ok(definitions.length > 0, "Definitions exist");
 
         const definition = definitions[0];
-        const expectedFile = path.join(workspaceRoot, "src/store/index.js");
-        const expectedLine = 50;
+        const expectedFile = path.join(workspaceRoot, "src/store/index.ts");
+        const expectedLine = 62;
         const expectedCharacter = 4;
         assert.strictEqual(
           definition.uri.fsPath,
@@ -1989,12 +1989,12 @@ suite("js basic", () => {
     );
   });
 
-  suite("modal.js", () => {
+  suite("modal.ts", () => {
     let workspaceRoot: string = "";
 
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
-        path.join(workspaceRoot, "src/store/modules/modal.js")
+        path.join(workspaceRoot, "src/store/modules/modal.ts")
       );
 
       return vscode.workspace.openTextDocument(targetFileUri);
@@ -2032,9 +2032,9 @@ suite("js basic", () => {
         const definition = definitions[0];
         const expectedFile = path.join(
           workspaceRoot,
-          "src/store/modules/modal.js"
+          "src/store/modules/modal.ts"
         );
-        const expectedLine = 29;
+        const expectedLine = 33;
         const expectedCharacter = 4;
         assert.strictEqual(
           definition.uri.fsPath,
@@ -2081,9 +2081,9 @@ suite("js basic", () => {
         const definition = definitions[0];
         const expectedFile = path.join(
           workspaceRoot,
-          "src/store/modules/modal.js"
+          "src/store/modules/modal.ts"
         );
-        const expectedLine = 32;
+        const expectedLine = 36;
         const expectedCharacter = 4;
         assert.strictEqual(
           definition.uri.fsPath,

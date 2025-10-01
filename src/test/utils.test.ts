@@ -1,6 +1,10 @@
 import * as vscode from "vscode";
 
-export async function waitForLoadingExtension(extension: vscode.Extension<any>) {
+export async function waitForLoadingExtension() {
+  const extension = vscode.extensions.getExtension(
+    "qjsrodksro.vuex-reference-helper"
+  ) as vscode.Extension<any>;
+
   if (!extension.isActive) {
     await extension.activate();
   }
