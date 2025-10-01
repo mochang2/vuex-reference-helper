@@ -12,7 +12,9 @@ import { clearAst, getAst } from "./ast";
 
 let symbolTable: VuexEntity[] = [];
 
-export async function buildSymbolTable(): Promise<void> {
+const invalidFileGlob = "/[(node_modules)|(out)]/**";
+
+export async function buildSymbolTable(): Promise<vscode.Uri[]> {
   // regard as createStore is declared not in vue file(currently not supported for vue)
   async function checkIfVuexEntry(
     file: vscode.Uri
@@ -64,7 +66,7 @@ export async function buildSymbolTable(): Promise<void> {
   async function findVuexEntry(): Promise<[vscode.Uri, string] | [null, null]> {
     const files = await vscode.workspace.findFiles(
       "src/**/*.[jt]s",
-      "/[(node_modules)|(out)|(output)|(dist)]/**"
+      invalidFileGlob
     ); // TODO(document): src 하위에 있는 부분만 분석함 + node_modules, out, output, dist 하위의 모든 파일 제외
 
     for (const file of files) {
@@ -316,7 +318,7 @@ export async function buildSymbolTable(): Promise<void> {
     console.log("vuex entry file is not found");
     symbolTable = []; // 초기화
 
-    return;
+    return [];
   }
 
   const entryAstResult = await getAst(vuexEntryFile);
@@ -324,7 +326,7 @@ export async function buildSymbolTable(): Promise<void> {
     console.log("parsing vuex entry file failed");
     symbolTable = [];
 
-    return;
+    return [];
   }
 
   let rootConfigObject: ObjectExpression | null = null;
@@ -358,6 +360,8 @@ export async function buildSymbolTable(): Promise<void> {
     position: new vscode.Position(0, 0), // no need to locate
     pastNamespaces: [],
   });
+
+  return [];
 }
 
 export function querySymbolTable(
