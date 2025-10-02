@@ -318,24 +318,24 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
         let parts: string[] = [targetNodeInfo.word];
         let current = targetNodeInfo.parent;
 
-        while (current && current.type === "MemberExpression") {
+        while (current && (current.type === "MemberExpression" || current.type === "OptionalMemberExpression" || current.type === "TSNonNullExpression")) {
           if (
-            current.property.type === "Identifier" &&
+            current.property?.type === "Identifier" &&
             current.property !== targetNodeInfo.node
           ) {
             if (
-              current.property.name === storeLocalName ||
-              current.property.name === "state"
+              current.property?.name === storeLocalName ||
+              current.property?.name === "state"
             ) {
               break;
             }
-            parts.unshift(current.property.name);
-          } else if (current.object.type === "Identifier") {
-            parts.unshift(current.object.name);
+            parts.unshift(current.property?.name);
+          } else if (current.object?.type === "Identifier") {
+            parts.unshift(current.object?.name);
             break;
           }
 
-          current = current.object;
+          current = current.object || current.expression;
         }
 
         return parts.join(".");
