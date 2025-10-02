@@ -34,7 +34,7 @@ const abc1 = computed(() => store.state.abc);
 const abc2 = computed(() => store.getters.abc);
 
 // banner.js
-const { isBannerOpen1, isBannerOpen2, openBanner, closeBanner } = useBanner();
+const { isBannerOpen1, isBannerOpen2, isBannerOpen3, openBanner, closeBanner } = useBanner();
 
 // popup.js
 const isPopupOpen1 = computed(() => store.state.popup.isOpen);
@@ -100,7 +100,7 @@ const closeModalAsync = () => {
   </div>
   <br />
   <div>
-    isBannerOpen1: {{ isBannerOpen1 }}<br />isBannerOpen2: {{ isBannerOpen2 }}
+    isBannerOpen1: {{ isBannerOpen1 }}<br />isBannerOpen2: {{ isBannerOpen2 }}<br />isBannerOpen3: {{ isBannerOpen3 }}
   </div>
   <br />
   <br />

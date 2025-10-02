@@ -8,6 +8,7 @@ export const useBanner = () => {
 
   const isBannerOpen1 = computed(() => st.state.myBanner.isOpen);
   const isBannerOpen2 = computed(() => st.getters["myBanner/getIsOpen"]);
+  const isBannerOpen3 = computed(() => st!.state?.myBanner!.isOpen); // [TEST] normally execute when optional chainings or non-null assertion operations are used
   const openBanner = () => {
     st
       .commit(
@@ -21,6 +22,7 @@ export const useBanner = () => {
   return {
     isBannerOpen1,
     isBannerOpen2,
+    isBannerOpen3,
     openBanner,
     closeBanner,
   };

@@ -1710,6 +1710,90 @@ suite("ts basic", () => {
       );
     });
 
+    test("Clicking 'myBanner' of st!.state?.myBanner!.isOpen leads to a banner module itself", async () => {
+      // given
+      await waitForLoadingExtension();
+
+      const document = await getDocument();
+      const searchString = "st!.state?.myBanner!.isOpen";
+      const startIndex = document.getText().indexOf(searchString);
+
+      assert.ok(startIndex > -1, "st!.state?.myBanner!.isOpen exists");
+
+      const position = document.positionAt(startIndex + "st!.state?.".length); // position of "myBanner"
+
+      // when
+      const definitions = await vscode.commands.executeCommand<
+        vscode.Location[]
+      >("vscode.executeDefinitionProvider", document.uri, position);
+
+      // then
+      assert.ok(definitions.length > 0, "Definitions exist");
+
+      const definition = definitions[0];
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 8;
+      const expectedCharacter = 22;
+      assert.strictEqual(
+        definition.uri.fsPath,
+        expectedFile,
+        `Definition is declared at the ${expectedFile} file`
+      );
+      assert.strictEqual(
+        definition.range.start.line,
+        expectedLine,
+        `Defintion is declared at the line ${expectedLine}th line`
+      );
+      assert.strictEqual(
+        definition.range.end.character,
+        expectedCharacter,
+        `Defintion is declared at the line ${expectedCharacter}th character`
+      );
+    });
+
+    test("Clicking 'isOpen' of st!.state?.myBanner!.isOpen leads to a state of banner.ts", async () => {
+      // given
+      await waitForLoadingExtension();
+
+      const document = await getDocument();
+      const searchString = "st!.state?.myBanner!.isOpen";
+      const startIndex = document.getText().indexOf(searchString);
+
+      assert.ok(startIndex > -1, "st!.state?.myBanner!.isOpen exists");
+
+      const position = document.positionAt(
+        startIndex + "st!.state?.myBanner!.".length
+      ); // position of "isOpen"
+
+      // when
+      const definitions = await vscode.commands.executeCommand<
+        vscode.Location[]
+      >("vscode.executeDefinitionProvider", document.uri, position);
+
+      // then
+      assert.ok(definitions.length > 0, "Definitions exist");
+
+      const definition = definitions[0];
+      const expectedFile = path.join(workspaceRoot, "src/store/banner.ts");
+      const expectedLine = 11;
+      const expectedCharacter = 4;
+      assert.strictEqual(
+        definition.uri.fsPath,
+        expectedFile,
+        `Definition is declared at the ${expectedFile} file`
+      );
+      assert.strictEqual(
+        definition.range.start.line,
+        expectedLine,
+        `Defintion is declared at the line ${expectedLine}th line`
+      );
+      assert.strictEqual(
+        definition.range.end.character,
+        expectedCharacter,
+        `Defintion is declared at the line ${expectedCharacter}th character`
+      );
+    });
+
     test("Clicking 'myBanner' of st\n.commit(\n\"myBanner/open\"\n) leads to a banner module itself", async () => {
       // given
       await waitForLoadingExtension();
