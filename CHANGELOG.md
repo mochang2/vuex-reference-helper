@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2025.10.02
+
+### Fixed
+
+- Support the optional chaining and the non-null assertion operation
+  - ex. `store.state.module?.state` or `store?.state?.object1!.key`
+
 ## [2.0.0] - 2025.10.01
 
 ### Changed
