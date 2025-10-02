@@ -37,6 +37,14 @@ It also supports **alias and path resolution**, making it easier to jump directl
 - `.vue` script or script setup blocks
 - Regular `.js` and `.ts` files
 
+## Supports
+
+```json
+"engines": {
+  "vscode": "^1.99.0"
+}
+```
+
 ## License
 
 [MIT](https://mit-license.org/)
