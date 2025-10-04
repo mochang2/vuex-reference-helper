@@ -12,7 +12,8 @@ import { clearAst, getAst } from "./ast";
 
 let symbolTable: VuexEntity[] = [];
 
-const invalidFileGlob = "{node_modules,out,dist,build,.nuxt,.next,.output,.vite,coverage,.temp,.cache}/**";
+const invalidFileGlob =
+  "{node_modules,out,dist,build,.nuxt,.next,.output,.vite,coverage,.temp,.cache}/**";
 
 export async function buildSymbolTable(): Promise<vscode.Uri[]> {
   // regard as createStore is declared not in vue file(currently not supported for vue)
@@ -307,6 +308,36 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
     return results;
   }
 
+  async function findVuexEntryUsageFiles(
+    vuexEntryFile: vscode.Uri
+  ): Promise<vscode.Uri[]> {
+    const files = await vscode.workspace.findFiles(
+      "**/*.[jt]s",
+      invalidFileGlob
+    );
+
+    const result: vscode.Uri[] = [];
+
+    for (const file of files) {
+      const astResult = await getAst(file);
+      if (!astResult) {
+        continue;
+      }
+
+      traverse(astResult.ast, {
+        ImportDeclaration(path) {
+          const resolvedUri = resolveModuleUri(file, path.node.source.value);
+          if (resolvedUri?.path === vuexEntryFile.path) {
+            result.push(file);
+            path.stop();
+          }
+        },
+      });
+    }
+
+    return result;
+  }
+
   console.log("execute buildSymbolTable");
 
   clearAst();
@@ -361,7 +392,14 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
     pastNamespaces: [],
   });
 
-  return [];
+  const vuexEntryUsageFiles = await findVuexEntryUsageFiles(vuexEntryFile);
+
+  console.log(
+    "vuex entry usage files:",
+    vuexEntryUsageFiles.map((file) => file.path)
+  );
+
+  return vuexEntryUsageFiles;
 }
 
 export function querySymbolTable(
