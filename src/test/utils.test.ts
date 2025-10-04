@@ -12,3 +12,7 @@ export async function waitForLoadingExtension() {
   // Wait a bit more to ensure symbol table is fully built
   await new Promise((resolve) => setTimeout(resolve, 100));
 }
+
+export async function sleep(ms: number = 200) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
