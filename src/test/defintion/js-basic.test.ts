@@ -4,9 +4,16 @@ import * as path from "path";
 import { waitForLoadingExtension } from "../utils.test";
 
 suite("js basic", () => {
-  suite("App.vue", () => {
-    let workspaceRoot: string = "";
+  let workspaceRoot: string = "";
 
+  suiteSetup(() => {
+    workspaceRoot = path.resolve(
+      __dirname,
+      "../../../fixtures/definition/js/basic"
+    );
+  });
+
+  suite("App.vue", () => {
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
         path.join(workspaceRoot, "src/App.vue")
@@ -1525,8 +1532,6 @@ suite("js basic", () => {
   });
 
   suite("useBanner.js", () => {
-    let workspaceRoot: string = "";
-
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
         path.join(workspaceRoot, "src/compositions/useBanner.js")
@@ -1534,13 +1539,6 @@ suite("js basic", () => {
 
       return vscode.workspace.openTextDocument(targetFileUri);
     }
-
-    suiteSetup(() => {
-      workspaceRoot = path.resolve(
-        __dirname,
-        "../../../fixtures/definition/js/basic"
-      );
-    });
 
     test("Clicking 'myBanner' of st.state.myBanner.isOpen leads to a banner module itself", async () => {
       // given
@@ -1962,8 +1960,6 @@ suite("js basic", () => {
   });
 
   suite("index.js", () => {
-    let workspaceRoot: string = "";
-
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
         path.join(workspaceRoot, "src/store/index.js")
@@ -1971,13 +1967,6 @@ suite("js basic", () => {
 
       return vscode.workspace.openTextDocument(targetFileUri);
     }
-
-    suiteSetup(() => {
-      workspaceRoot = path.resolve(
-        __dirname,
-        "../../../fixtures/definition/js/basic"
-      );
-    });
 
     suite(
       "Clicking 'incrementBy' of dispatch(\"incrementBy\", 1) leads to an action of itself",
@@ -2074,8 +2063,6 @@ suite("js basic", () => {
   });
 
   suite("modal.js", () => {
-    let workspaceRoot: string = "";
-
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
         path.join(workspaceRoot, "src/store/modules/modal.js")
@@ -2083,13 +2070,6 @@ suite("js basic", () => {
 
       return vscode.workspace.openTextDocument(targetFileUri);
     }
-
-    suiteSetup(() => {
-      workspaceRoot = path.resolve(
-        __dirname,
-        "../../../fixtures/definition/js/basic"
-      );
-    });
 
     suite(
       "Clicking 'open' of commit(\"open\") leads to a mutation of itself",

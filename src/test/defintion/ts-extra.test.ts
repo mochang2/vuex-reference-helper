@@ -4,9 +4,16 @@ import * as path from "path";
 import { waitForLoadingExtension } from "../utils.test";
 
 suite("ts extra", () => {
-  suite("App.vue", () => {
-    let workspaceRoot: string = "";
+  let workspaceRoot: string = "";
 
+  suiteSetup(() => {
+    workspaceRoot = path.resolve(
+      __dirname,
+      "../../../fixtures/definition/ts/extra"
+    );
+  });
+
+  suite("App.vue", () => {
     async function getDocument(): Promise<vscode.TextDocument> {
       const targetFileUri = vscode.Uri.file(
         path.join(workspaceRoot, "src/App.vue")
@@ -14,13 +21,6 @@ suite("ts extra", () => {
 
       return vscode.workspace.openTextDocument(targetFileUri);
     }
-
-    suiteSetup(() => {
-      workspaceRoot = path.resolve(
-        __dirname,
-        "../../../fixtures/definition/ts/extra"
-      );
-    });
 
     test("Clicking 'getCount' of store.getters.getCount leads to a getter of index.ts", async () => {
       // given
