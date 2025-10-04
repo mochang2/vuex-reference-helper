@@ -65,9 +65,9 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
 
   async function findVuexEntry(): Promise<[vscode.Uri, string] | [null, null]> {
     const files = await vscode.workspace.findFiles(
-      "src/**/*.[jt]s",
+      "**/*.[jt]s",
       invalidFileGlob
-    ); // TODO(document): src 하위에 있는 부분만 분석함 + node_modules, out, output, dist 하위의 모든 파일 제외
+    );
 
     for (const file of files) {
       const [isVuexEntry, createStoreLocalName] = await checkIfVuexEntry(file);
