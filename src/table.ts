@@ -12,7 +12,7 @@ import { clearAst, getAst } from "./ast";
 
 let symbolTable: VuexEntity[] = [];
 
-const invalidFileGlob = "/[(node_modules)|(out)]/**";
+const invalidFileGlob = "{node_modules,out,dist,build,.nuxt,.next,.output,.vite,coverage,.temp,.cache}/**";
 
 export async function buildSymbolTable(): Promise<vscode.Uri[]> {
   // regard as createStore is declared not in vue file(currently not supported for vue)
