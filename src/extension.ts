@@ -4,8 +4,7 @@ import { buildSymbolTable } from "./table";
 import { removeAst } from "./ast";
 
 // [TODO]
-// 1. (2.1.0) vuexEntryFile에 변경이 생길 때마다 반영될 수 있도록 + path.ts file path resolve할 때 실제로 파일이 존재하는지 확인하는 작업
-// 2. (2.2.0) suggest 기능 추가
+// 1. (2.2.0) suggest 기능 추가
 
 export async function activate(context: vscode.ExtensionContext) {
   let vuexEntryUsageFiles = await buildSymbolTable();

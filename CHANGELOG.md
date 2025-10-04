@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2025.10.04
+
+### Added
+
+- Enable a function to rebuild the vuex symbol table when the vuex usage files are changed
+
+### Fixed
+
+- Change a path resolution to check if the file actually exists
+- Change ast cache key to identify files easily
+  - `vscode.Uri.toString()` -> `vscode.Uri.fsPath`
+
 ## [2.0.1] - 2025.10.02
 
 ### Fixed
@@ -13,7 +25,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Supported VS code engine version
+- Change supported VS code engine version
   - `^1.102.0` -> `^1.99.0`
 
 ### Fixed
@@ -43,7 +55,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Initial release of Vuex Reference Helper for VSCode.
-- Enabled Ctrl/Cmd + Click navigation to Vuex definitions:
+- Enable Ctrl/Cmd + Click navigation to Vuex definitions:
   - `state`
   - `getters`
   - `mutations`
