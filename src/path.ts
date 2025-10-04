@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "node:path";
+import * as fs from "node:fs";
 import type { PathConfig } from "./types";
 
 let pathConfig: PathConfig | null = null;
@@ -115,7 +116,8 @@ export function resolveModuleUri(
 
   // resolve path2 - if pathConfig not exists
   if (!resolvedPathWithoutExt) {
-    if (importPath.startsWith(".") || path.isAbsolute(importPath)) {
+    const isRelative = importPath.startsWith(".");
+    if (isRelative || path.isAbsolute(importPath)) {
       const baseDir = path.dirname(baseFileUri.fsPath);
       resolvedPathWithoutExt = path.resolve(baseDir, importPath);
     } else {
@@ -126,8 +128,22 @@ export function resolveModuleUri(
 
   // not barrel file
   try {
-    const fullPath = `${resolvedPathWithoutExt}.${pathConfig?.type || "ts"}`; // tsconfig firstly
-    return vscode.Uri.file(fullPath);
+    let relativeRemovedImportPath = importPath;
+    while (
+      relativeRemovedImportPath.length > 0 &&
+      relativeRemovedImportPath.startsWith(".")
+    ) {
+      relativeRemovedImportPath = relativeRemovedImportPath.slice(1);
+    }
+
+    const isImportPathIncludingExtension =
+      relativeRemovedImportPath.includes(".");
+    const fullPath = isImportPathIncludingExtension
+      ? `${resolvedPathWithoutExt}`
+      : `${resolvedPathWithoutExt}.${pathConfig?.type || "ts"}`; // tsconfig firstly
+    if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+      return vscode.Uri.file(fullPath);
+    }
   } catch {
     // do nothing
   }
@@ -138,7 +154,9 @@ export function resolveModuleUri(
       resolvedPathWithoutExt,
       `index.${pathConfig?.type || "ts"}` // tsconfig firstly
     );
-    return vscode.Uri.file(fullPath);
+    if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+      return vscode.Uri.file(fullPath);
+    }
   } catch {
     // do nothing
   }
