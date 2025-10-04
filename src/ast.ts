@@ -23,9 +23,9 @@ function extractScriptFromVue(
 }
 
 export async function getAst(file: vscode.Uri): Promise<AstResult | null> {
-  const fileUriString = file.toString();
-  if (astCache.has(fileUriString)) {
-    return astCache.get(fileUriString) as AstResult;
+  const filePath = file.fsPath;
+  if (astCache.has(filePath)) {
+    return astCache.get(filePath) as AstResult;
   }
 
   try {
@@ -53,7 +53,7 @@ export async function getAst(file: vscode.Uri): Promise<AstResult | null> {
     });
 
     const result = { ast, scriptStartLine };
-    astCache.set(fileUriString, result);
+    astCache.set(filePath, result);
 
     return result;
   } catch (error) {
@@ -62,10 +62,10 @@ export async function getAst(file: vscode.Uri): Promise<AstResult | null> {
   }
 }
 
-export function removeAst(file: vscode.Uri): void {
-  const fileUriString = file.toString();
-  if (astCache.has(fileUriString)) {
-    astCache.delete(fileUriString);
+export function removeAst(filePath: string): void {
+  if (astCache.has(filePath)) {
+    console.log(`cache remove for: ${filePath}`);
+    astCache.delete(filePath);
   }
 }
 
