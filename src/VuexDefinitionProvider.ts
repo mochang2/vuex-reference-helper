@@ -2,13 +2,9 @@ import * as vscode from "vscode";
 import traverse from "@babel/traverse";
 import { querySymbolTable } from "./table";
 import { getAst } from "./ast";
+import { analyzeStoreContext } from "./storeContext";
 import type { Node, NodePath } from "@babel/traverse";
-import type {
-  VuexModuleEntity,
-  Ast,
-  StoreContext,
-  TargetNodeInfo,
-} from "./types";
+import type { VuexModuleEntity, Ast, TargetNodeInfo } from "./types";
 
 export class VuexDefinitionProvider implements vscode.DefinitionProvider {
   // handle in case that white spaces are included, such as the below patterns
@@ -75,61 +71,6 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       });
 
       return targetNodePath;
-    }
-
-    function analyzeStoreContext(ast: Ast): StoreContext {
-      function findUseStoreLocalName(): string | null {
-        let useStoreLocalName: string | null = null;
-
-        traverse(ast, {
-          ImportDeclaration(path) {
-            if (path.node.source.value === "vuex") {
-              for (const specifier of path.node.specifiers) {
-                if (
-                  specifier.type === "ImportSpecifier" &&
-                  specifier.imported.type === "Identifier" &&
-                  specifier.imported.name === "useStore"
-                ) {
-                  useStoreLocalName = specifier.local.name;
-                  path.stop();
-                }
-              }
-            }
-          },
-        });
-
-        return useStoreLocalName;
-      }
-
-      function findStoreLocalName(useStoreLocalName: string): string | null {
-        let storeLocalName: string | null = null;
-
-        traverse(ast, {
-          CallExpression(path) {
-            if (
-              path.node.callee.type === "Identifier" &&
-              path.node.callee.name === useStoreLocalName &&
-              path.parent.type === "VariableDeclarator" &&
-              path.parent.id.type === "Identifier"
-            ) {
-              storeLocalName = path.parent.id.name;
-              path.stop();
-            }
-          },
-        });
-
-        return storeLocalName;
-      }
-
-      const useStoreLocalName = findUseStoreLocalName();
-      const storeLocalName = useStoreLocalName
-        ? findStoreLocalName(useStoreLocalName)
-        : null;
-
-      return {
-        useStoreLocalName,
-        storeLocalName,
-      };
     }
 
     function handleStringLiteral(
@@ -318,7 +259,12 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
         let parts: string[] = [targetNodeInfo.word];
         let current = targetNodeInfo.parent;
 
-        while (current && (current.type === "MemberExpression" || current.type === "OptionalMemberExpression" || current.type === "TSNonNullExpression")) {
+        while (
+          current &&
+          (current.type === "MemberExpression" ||
+            current.type === "OptionalMemberExpression" ||
+            current.type === "TSNonNullExpression")
+        ) {
           if (
             current.property?.type === "Identifier" &&
             current.property !== targetNodeInfo.node
