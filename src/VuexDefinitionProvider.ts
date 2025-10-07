@@ -64,7 +64,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       }
     }
 
-    // store.state.object.state or state.state.module.state (nested state) or store.getters.getter
+    // store.state.object.state or state.state.module.state or store.getters.getter
     // => locate to a state declaration or a getter declaration or a module declaration
     if (targetNodePath.node.type === "Identifier") {
       const result = this.handleIdentifier(
@@ -319,7 +319,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
   ): vscode.Location | null {
     if (storeLocalName) {
       const statePath = this.buildStatePath(targetNodeInfo, storeLocalName);
-      const entity =
+      const stateEntity =
         querySymbolTable(
           (symbol) =>
             symbol.name === targetNodeInfo.word && symbol.type === "modules"
@@ -327,9 +327,16 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
         querySymbolTable(
           (symbol) => symbol.name === statePath && symbol.type === "state"
         );
+      if (stateEntity) {
+        return new vscode.Location(stateEntity.fileUri, stateEntity.position);
+      }
 
-      if (entity) {
-        return new vscode.Location(entity.fileUri, entity.position);
+      const getterPath = this.buildGetterPath(targetNodeInfo);
+      const getterEntity = querySymbolTable(
+        (symbol) => symbol.name === getterPath && symbol.type === "getters"
+      );
+      if (getterEntity) {
+        return new vscode.Location(getterEntity.fileUri, getterEntity.position);
       }
     }
 
@@ -377,6 +384,15 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     }
 
     return parts.join(".");
+  }
+
+  private buildGetterPath(targetNodeInfo: TargetNodeInfo): string {
+    const parent = targetNodeInfo.parent.object || targetNodeInfo.parent.expression;
+    if (parent.property.type === "Identifier" && parent.property.name === "getters") {
+      return targetNodeInfo.word;
+    }
+
+    return "";
   }
 
   private handleModuleStateIdentifier(
