@@ -52,7 +52,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     };
 
     // store.dispatch("action") or store.commit("mutation") or store.getters["getter"] or store.dispatch("module/action") or store.commit("module/mutation") or store.getters["module/getter"] (using parentheses)
-    // => locate to a mutation declaration or a getter declaration
+    // => locate to a mutation declaration or a getter declaration or a module declaration
     if (targetNodePath.node.type === "StringLiteral") {
       const result = this.handleStringLiteral(
         targetNodeInfo,
@@ -64,7 +64,8 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       }
     }
 
-    // store.state.object.state or state.state.module.state (nested state)
+    // store.state.object.state or state.state.module.state (nested state) or store.getters.getter
+    // => locate to a state declaration or a getter declaration or a module declaration
     if (targetNodePath.node.type === "Identifier") {
       const result = this.handleIdentifier(
         targetNodeInfo,
@@ -76,9 +77,7 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       }
     }
 
-    // store.state.module.state or store.getters.getter
-    // => locate to a module declaration, a getter declaration, a mutation declaration or a state declaration
-    return this.handleTextItself(word);
+    return null;
   }
 
   private findTargetNodePath(
@@ -103,10 +102,12 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
           cursorLine <= node.loc.end.line &&
           (cursorLine > node.loc.start.line ||
             cursorChar >= node.loc.start.column) &&
-          (cursorLine < node.loc.end.line ||
-            cursorChar <= node.loc.end.column)
+          (cursorLine < node.loc.end.line || cursorChar <= node.loc.end.column)
         ) {
-          if (!targetNodePath || this.isNodeSmaller(node, targetNodePath.node)) {
+          if (
+            !targetNodePath ||
+            this.isNodeSmaller(node, targetNodePath.node)
+          ) {
             targetNodePath = path;
           }
         }
@@ -311,7 +312,6 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     return null;
   }
 
-
   private handleIdentifier(
     targetNodeInfo: TargetNodeInfo,
     storeLocalName: string | null,
@@ -319,9 +319,14 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
   ): vscode.Location | null {
     if (storeLocalName) {
       const statePath = this.buildStatePath(targetNodeInfo, storeLocalName);
-      const entity = querySymbolTable(
-        (symbol) => symbol.name === statePath && symbol.type === "state"
-      );
+      const entity =
+        querySymbolTable(
+          (symbol) =>
+            symbol.name === targetNodeInfo.word && symbol.type === "modules"
+        ) ||
+        querySymbolTable(
+          (symbol) => symbol.name === statePath && symbol.type === "state"
+        );
 
       if (entity) {
         return new vscode.Location(entity.fileUri, entity.position);
@@ -339,7 +344,10 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     return null;
   }
 
-  private buildStatePath(targetNodeInfo: TargetNodeInfo, storeLocalName: string): string {
+  private buildStatePath(
+    targetNodeInfo: TargetNodeInfo,
+    storeLocalName: string
+  ): string {
     let parts: string[] = [targetNodeInfo.word];
     let current = targetNodeInfo.parent;
 
@@ -439,28 +447,6 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
     const entity = querySymbolTable(
       (symbol) => symbol.name === name && symbol.type === "state"
     );
-    if (entity) {
-      return new vscode.Location(entity.fileUri, entity.position);
-    }
-
-    return null;
-  }
-
-  private handleTextItself(word: string): vscode.Location | null {
-    const entity =
-      querySymbolTable(
-        (symbol) => symbol.name === word && symbol.type === "modules"
-      ) ||
-      querySymbolTable(
-        (symbol) => symbol.name === word && symbol.type === "getters"
-      ) ||
-      querySymbolTable(
-        (symbol) => symbol.name === word && symbol.type === "mutations"
-      ) ||
-      querySymbolTable(
-        (symbol) => symbol.name === word && symbol.type === "state"
-      );
-
     if (entity) {
       return new vscode.Location(entity.fileUri, entity.position);
     }
