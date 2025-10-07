@@ -285,6 +285,29 @@ suite("js basic", () => {
       );
     });
 
+    test("Clicking second 'appDetail' of store.state.appDetail.appDetail does not lead to anything", async () => {
+      // given
+      await waitForLoadingExtension();
+
+      const document = await getDocument();
+      const searchString = "store.state.appDetail.appDetail";
+      const startIndex = document.getText().indexOf(searchString);
+
+      assert.ok(startIndex > -1, "store.state.appDetail.appDetail exists");
+
+      const position = document.positionAt(
+        startIndex + "store.state.appDetail.".length
+      ); // position of second "appDetail"
+
+      // when
+      const definitions = await vscode.commands.executeCommand<
+        vscode.Location[]
+      >("vscode.executeDefinitionProvider", document.uri, position);
+
+      // then
+      assert.ok(definitions.length === 0, "Definitions do not exist");
+    });
+
     test("Clicking 'setScrollPosition' of store.commit(\"setScrollPosition\") leads to a mutation of index.js", async () => {
       // given
       await waitForLoadingExtension();

@@ -23,6 +23,7 @@ const incrementByAsync = () => {
 };
 
 const appDetail = computed(() => store.state.appDetail);
+const notAppDetail = computed(() => store.state.appDetail.appDetail); // [TEST] normally execute on "appDetail", but not on "appDetail.appDetail"
 const setScrollPosition = () => {
   store.commit(
     "setScrollPosition",
