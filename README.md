@@ -15,6 +15,10 @@ It also supports **alias and path resolution**, making it easier to jump directl
 
 ![demo1](https://github.com/mochang2/vuex-reference-helper/blob/master/videos/navigation_demo.gif)
 
+> 📷 Demo2 - Suggestion
+
+![demo2](https://github.com/mochang2/vuex-reference-helper/blob/master/videos/suggestion_demo.gif)
+
 ## Requirements
 
 - **VS Code v1.102.0** or higher.
