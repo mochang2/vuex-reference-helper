@@ -9,7 +9,7 @@ suite("js extra", () => {
   suiteSetup(() => {
     workspaceRoot = path.resolve(
       __dirname,
-      "../../../fixtures/definition/js/extra"
+      "../../../fixtures/js/extra"
     );
   });
 

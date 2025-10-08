@@ -9,7 +9,7 @@ suite("js basic", () => {
   suiteSetup(() => {
     workspaceRoot = path.resolve(
       __dirname,
-      "../../../fixtures/definition/js/basic"
+      "../../../fixtures/js/basic"
     );
   });
 
@@ -21,13 +21,6 @@ suite("js basic", () => {
 
       return vscode.workspace.openTextDocument(targetFileUri);
     }
-
-    suiteSetup(() => {
-      workspaceRoot = path.resolve(
-        __dirname,
-        "../../../fixtures/definition/js/basic"
-      );
-    });
 
     test("Clicking 'getCount' of store.getters.getCount leads to a getter of index.js", async () => {
       // given
