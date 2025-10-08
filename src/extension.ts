@@ -4,9 +4,6 @@ import { VuexDefinitionProvider } from "./VuexDefinitionProvider";
 import { VuexCompletionItemProvider } from "./VuexCompletionItemProvider";
 import { removeAst } from "./ast";
 
-// [TODO]
-// 1. (2.2.0) suggest 기능 추가
-
 export async function activate(context: vscode.ExtensionContext) {
   let vuexEntryUsageFiles = await buildSymbolTable();
 

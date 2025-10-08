@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2025.10.08
+
+### Added
+
+- Add VSCode IntelliSense completion support
+  - `store.state.` shows all states
+  - `store.getters.` shows all getters without namespace
+  - `store.getters["` or `store.getters['` shows all getters
+  - `store.commit("` or `store.commit('` shows all mutations
+  - `store.dispatch("` or `store.dispatch('` shows all actions
+
+### Fixed
+
+- Fix incorrect navigation for nested state properties
+  - Clicking on the second or third `count` in `store.state.count.count.count` would incorrectly navigate to the definition of the first `count`
+
 ## [2.1.0] - 2025.10.04
 
 ### Added
