@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] - 2025.10.08
+
+### Added
+
+- Add a demo video of 2.2.0 feature
+
 ## [2.2.0] - 2025.10.08
 
 ### Added
