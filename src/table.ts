@@ -407,3 +407,7 @@ export function querySymbolTable(
 ): VuexEntity | undefined {
   return symbolTable.find((symbol) => condition(symbol));
 }
+
+export function getAllSymbols(): VuexEntity[] {
+  return [...symbolTable];
+}

@@ -7,18 +7,22 @@ import type { Node, NodePath } from "@babel/traverse";
 import type { VuexModuleEntity, Ast, TargetNodeInfo } from "./types";
 
 export class VuexDefinitionProvider implements vscode.DefinitionProvider {
-  // handle in case that white spaces are included, such as the below patterns
-  // " " = "any white space"
-  // `${storeLocalName} . state . state1`;
-  // `${storeLocalName} . state . state1 . state2`;
-  // `${storeLocalName} . getters . getter`;
-  // `${storeLocalName} . getters [ "module/getter" ] `;
-  // `${storeLocalName} . commit ( "mutation" ) `;
-  // `${storeLocalName} . commit ( "module/mutation" ) `;
+  /**
+   * handle in case that white spaces are included, such as the below patterns
+   * " " = "any white space"
+   * `${storeLocalName} . state . state1`;
+   * `${storeLocalName} . state . state1 . state2`;
+   * `${storeLocalName} . getters . getter`;
+   * `${storeLocalName} . getters [ "module/getter" ] `;
+   * `${storeLocalName} . commit ( "mutation" ) `;
+   * `${storeLocalName} . commit ( "module/mutation" ) `;
 
-  // but do not support like this format(abnormal line break)
-  // store.commit("zz/ff\
-  // vv")
+   * but do not support like this format(abnormal line break)
+   * store.commit("zz/ff\
+   * vv")
+   * and this format(template literal)
+   * store.commit(`${zz}/ff`)
+   */
   async provideDefinition(
     document: vscode.TextDocument,
     position: vscode.Position

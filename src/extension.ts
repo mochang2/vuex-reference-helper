@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
-import { VuexDefinitionProvider } from "./VuexDefinitionProvider";
 import { buildSymbolTable } from "./table";
+import { VuexDefinitionProvider } from "./VuexDefinitionProvider";
+import { VuexCompletionItemProvider } from "./VuexCompletionItemProvider";
 import { removeAst } from "./ast";
 
 // [TODO]
@@ -16,11 +17,22 @@ export async function activate(context: vscode.ExtensionContext) {
     { language: "vue", scheme: "file" },
     { language: "plaintext", scheme: "file", pattern: "**/*.vue" }, // for test
   ];
-  const provider = vscode.languages.registerDefinitionProvider(
+
+  const defintionProvider = vscode.languages.registerDefinitionProvider(
     selector,
     new VuexDefinitionProvider()
   );
-  context.subscriptions.push(provider);
+  context.subscriptions.push(defintionProvider);
+
+  const completionItemProvider =
+    vscode.languages.registerCompletionItemProvider(
+      selector,
+      new VuexCompletionItemProvider(),
+      ".",
+      "'",
+      '"'
+    );
+  context.subscriptions.push(completionItemProvider);
 
   // all events are included: create / delete / rename / character change
   const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(
