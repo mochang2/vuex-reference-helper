@@ -55,4 +55,40 @@ export default defineConfig([
       slow: 2000, // 1s
     },
   },
+  {
+    label: "js basic completion integration tests",
+    files: "out/test/completion/js-basic.test.js",
+    workspaceFolder: "./fixtures/js/basic",
+    mocha: {
+      timeout: 10000, // 10s
+      slow: 2000, // 1s
+    },
+  },
+  {
+    label: "js extra completion integration tests",
+    files: "out/test/completion/js-extra.test.js",
+    workspaceFolder: "./fixtures/js/extra",
+    mocha: {
+      timeout: 10000, // 10s
+      slow: 2000, // 1s
+    },
+  },
+  {
+    label: "ts basic completion integration tests",
+    files: "out/test/completion/ts-basic.test.js",
+    workspaceFolder: "./fixtures/ts/basic",
+    mocha: {
+      timeout: 10000, // 10s
+      slow: 2000, // 1s
+    },
+  },
+  {
+    label: "ts extra completion integration tests",
+    files: "out/test/completion/ts-extra.test.js",
+    workspaceFolder: "./fixtures/ts/extra",
+    mocha: {
+      timeout: 10000, // 10s
+      slow: 2000, // 1s
+    },
+  },
 ]);
