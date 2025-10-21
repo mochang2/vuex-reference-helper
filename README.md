@@ -21,11 +21,12 @@ It also supports **alias and path resolution**, making it easier to jump directl
 
 ## Requirements
 
-- **VS Code v1.102.0** or higher.
+- **VS Code v1.99.0** or higher.
 - Project must use Vuex (`createStore` entry file should be defined).
   - import as different name like `createStore as cs` is supported
 - If you use path aliases (e.g. `@`), ensure they are configured in:
   - `jsconfig.json` or `tsconfig.json`
+- For developing this extension, you should use v22.15.0 NodeJS or higher.
 
 ## Usage
 
