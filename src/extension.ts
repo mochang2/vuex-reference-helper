@@ -5,7 +5,7 @@ import { VuexCompletionItemProvider } from "./VuexCompletionItemProvider";
 import { removeAst } from "./ast";
 
 export async function activate(context: vscode.ExtensionContext) {
-  let vuexEntryUsageFiles = await buildSymbolTable();
+  let { vuexEntryUsageFiles, moduleFiles } = await buildSymbolTable();
 
   // allowed extensions: [js, ts, vue]
   const selector: vscode.DocumentSelector = [
@@ -37,8 +37,13 @@ export async function activate(context: vscode.ExtensionContext) {
       const isVuexEntryUsageFile = vuexEntryUsageFiles.some(
         (file) => file.fsPath === event.document.uri.fsPath
       );
-      if (isVuexEntryUsageFile) {
-        vuexEntryUsageFiles = await buildSymbolTable(); // rebuild symbol table
+      const isModuleFile = moduleFiles.some(
+        (file) => file.fsPath === event.document.uri.fsPath
+      );
+      if (isVuexEntryUsageFile || isModuleFile) {
+        const result = await buildSymbolTable(); // rebuild symbol table
+        vuexEntryUsageFiles = result.vuexEntryUsageFiles;
+        moduleFiles = result.moduleFiles;
       } else {
         removeAst(event.document.uri.fsPath); // remove from cache
       }

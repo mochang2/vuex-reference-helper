@@ -15,7 +15,10 @@ let symbolTable: VuexEntity[] = [];
 const invalidFileGlob =
   "{node_modules,out,dist,build,.nuxt,.next,.output,.vite,coverage,.temp,.cache}/**";
 
-export async function buildSymbolTable(): Promise<vscode.Uri[]> {
+export async function buildSymbolTable(): Promise<{
+  vuexEntryUsageFiles: vscode.Uri[];
+  moduleFiles: vscode.Uri[];
+}> {
   // regard as createStore is declared not in vue file(currently not supported for vue)
   async function checkIfVuexEntry(
     file: vscode.Uri
@@ -246,6 +249,10 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
             continue;
           }
 
+          if (!moduleFiles.some((uri) => uri.fsPath === moduleFileUri!.fsPath)) {
+            moduleFiles.push(moduleFileUri);
+          }
+
           const moduleAstResult = await getAst(moduleFileUri);
           if (!moduleAstResult) {
             continue;
@@ -344,12 +351,14 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
   await loadPathConfiguration();
 
   const [vuexEntryFile, createStoreLocalName] = await findVuexEntry();
+  const moduleFiles: vscode.Uri[] = [];
+  
   if (!vuexEntryFile) {
     // vuex entry가 없음
     console.log("vuex entry file is not found");
     symbolTable = []; // 초기화
 
-    return [];
+    return { vuexEntryUsageFiles: [], moduleFiles: [] };
   }
 
   const entryAstResult = await getAst(vuexEntryFile);
@@ -357,7 +366,7 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
     console.log("parsing vuex entry file failed");
     symbolTable = [];
 
-    return [];
+    return { vuexEntryUsageFiles: [], moduleFiles: [] };
   }
 
   let rootConfigObject: ObjectExpression | null = null;
@@ -391,6 +400,7 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
     position: new vscode.Position(0, 0), // no need to locate
     pastNamespaces: [],
   });
+  moduleFiles.unshift(vuexEntryFile);
 
   const vuexEntryUsageFiles = await findVuexEntryUsageFiles(vuexEntryFile);
 
@@ -398,8 +408,12 @@ export async function buildSymbolTable(): Promise<vscode.Uri[]> {
     "vuex entry usage files:",
     vuexEntryUsageFiles.map((file) => file.path)
   );
+  console.log(
+    "module files:",
+    moduleFiles.map((file) => file.path)
+  );
 
-  return vuexEntryUsageFiles;
+  return { vuexEntryUsageFiles, moduleFiles };
 }
 
 export function querySymbolTable(
