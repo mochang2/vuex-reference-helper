@@ -4,7 +4,53 @@ import { parse } from "@vue/compiler-sfc";
 import { TextDecoder } from "node:util";
 import type { AstResult } from "./types";
 
-const astCache = new Map<string, AstResult>(); // prevent re-parsing of the same file
+// to limit memory usage
+class LRUCache<K, V> {
+  private cache: Map<K, V>;
+  private maxSize: number;
+
+  constructor(maxSize: number = 100) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+  }
+
+  get(key: K): V | undefined {
+    const value = this.cache.get(key);
+    if (value !== undefined) {
+      // move used item to the end (most recently used)
+      this.cache.delete(key);
+      this.cache.set(key, value);
+    }
+    return value;
+  }
+
+  set(key: K, value: V): void {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxSize) {
+      // remove the oldest item (first item)
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
+    }
+    this.cache.set(key, value);
+  }
+
+  has(key: K): boolean {
+    return this.cache.has(key);
+  }
+
+  delete(key: K): boolean {
+    return this.cache.delete(key);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+const astCache = new LRUCache<string, AstResult>(100); // at most 100 files are cached
 
 function extractScriptFromVue(
   code: string
@@ -24,8 +70,9 @@ function extractScriptFromVue(
 
 export async function getAst(file: vscode.Uri): Promise<AstResult | null> {
   const filePath = file.fsPath;
-  if (astCache.has(filePath)) {
-    return astCache.get(filePath) as AstResult;
+  const cached = astCache.get(filePath);
+  if (cached) {
+    return cached;
   }
 
   try {
