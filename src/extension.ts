@@ -3,6 +3,9 @@ import { buildSymbolTable } from "./table";
 import { VuexDefinitionProvider } from "./VuexDefinitionProvider";
 import { VuexCompletionItemProvider } from "./VuexCompletionItemProvider";
 import { removeAst } from "./ast";
+import { createDebounce } from "./util";
+
+let cancelRebuildDebounce: (() => void) | null = null;
 
 export async function activate(context: vscode.ExtensionContext) {
   let { vuexEntryUsageFiles, moduleFiles } = await buildSymbolTable();
@@ -31,6 +34,19 @@ export async function activate(context: vscode.ExtensionContext) {
     );
   context.subscriptions.push(completionItemProvider);
 
+  const { debounced: debouncedRebuild, cancel: cancelRebuild } = createDebounce(
+    async () => {
+      try {
+        const result = await buildSymbolTable(); // rebuild symbol table
+        vuexEntryUsageFiles = result.vuexEntryUsageFiles;
+        moduleFiles = result.moduleFiles;
+      } catch (error) {
+        console.error("Error rebuilding symbol table:", error);
+      }
+    },
+  );
+  cancelRebuildDebounce = cancelRebuild;
+
   // all events are included: create / delete / rename / character change
   const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(
     async (event) => {
@@ -41,9 +57,7 @@ export async function activate(context: vscode.ExtensionContext) {
         (file) => file.fsPath === event.document.uri.fsPath
       );
       if (isVuexEntryUsageFile || isModuleFile) {
-        const result = await buildSymbolTable(); // rebuild symbol table
-        vuexEntryUsageFiles = result.vuexEntryUsageFiles;
-        moduleFiles = result.moduleFiles;
+        debouncedRebuild();
       } else {
         removeAst(event.document.uri.fsPath); // remove from cache
       }
