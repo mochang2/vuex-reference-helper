@@ -62,20 +62,20 @@ export async function loadPathConfiguration(): Promise<void> {
     return null;
   }
 
-  const configFiles = await vscode.workspace.findFiles(
-    "{jsconfig,tsconfig}.json",
-    "**/node_modules/**",
-    1
-  );
-
-  if (configFiles.length === 0) {
-    return;
-  }
-
-  const configFile = configFiles[0];
-  const type = configFile.fsPath.endsWith("tsconfig.json") ? "ts" : "js";
-
   try {
+    const configFiles = await vscode.workspace.findFiles(
+      "{jsconfig,tsconfig}.json",
+      "**/node_modules/**",
+      1
+    );
+  
+    if (configFiles.length === 0) {
+      return;
+    }
+  
+    const configFile = configFiles[0];
+    const type = configFile.fsPath.endsWith("tsconfig.json") ? "ts" : "js";
+
     const result = await findCompilerOptions(configFiles[0]);
     if (result) {
       pathConfig = {

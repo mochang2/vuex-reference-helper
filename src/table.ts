@@ -68,19 +68,24 @@ export async function buildSymbolTable(): Promise<{
   }
 
   async function findVuexEntry(): Promise<[vscode.Uri, string] | [null, null]> {
-    const files = await vscode.workspace.findFiles(
-      "**/*.[jt]s",
-      invalidFileGlob
-    );
-
-    for (const file of files) {
-      const [isVuexEntry, createStoreLocalName] = await checkIfVuexEntry(file);
-      if (isVuexEntry) {
-        return [file, createStoreLocalName];
+    try {
+      const files = await vscode.workspace.findFiles(
+        "**/*.[jt]s",
+        invalidFileGlob
+      );
+  
+      for (const file of files) {
+        const [isVuexEntry, createStoreLocalName] = await checkIfVuexEntry(file);
+        if (isVuexEntry) {
+          return [file, createStoreLocalName];
+        }
       }
+  
+      return [null, null];
+    } catch (error) {
+      console.error("Error finding vuex entry:", error);
+      return [null, null];
     }
-
-    return [null, null];
   }
 
   async function parseModuleConfig(
@@ -318,31 +323,36 @@ export async function buildSymbolTable(): Promise<{
   async function findVuexEntryUsageFiles(
     vuexEntryFile: vscode.Uri
   ): Promise<vscode.Uri[]> {
-    const files = await vscode.workspace.findFiles(
-      "**/*.[jt]s",
-      invalidFileGlob
-    );
-
-    const result: vscode.Uri[] = [];
-
-    for (const file of files) {
-      const astResult = await getAst(file);
-      if (!astResult) {
-        continue;
+    try {
+      const files = await vscode.workspace.findFiles(
+        "**/*.[jt]s",
+        invalidFileGlob
+      );
+  
+      const result: vscode.Uri[] = [];
+  
+      for (const file of files) {
+        const astResult = await getAst(file);
+        if (!astResult) {
+          continue;
+        }
+  
+        traverse(astResult.ast, {
+          ImportDeclaration(path) {
+            const resolvedUri = resolveModuleUri(file, path.node.source.value);
+            if (resolvedUri?.path === vuexEntryFile.path) {
+              result.push(file);
+              path.stop();
+            }
+          },
+        });
       }
-
-      traverse(astResult.ast, {
-        ImportDeclaration(path) {
-          const resolvedUri = resolveModuleUri(file, path.node.source.value);
-          if (resolvedUri?.path === vuexEntryFile.path) {
-            result.push(file);
-            path.stop();
-          }
-        },
-      });
+  
+      return result;
+    } catch (error) {
+      console.error("Error finding vuex entry usage files:", error);
+      return [];
     }
-
-    return result;
   }
 
   console.log("execute buildSymbolTable");
@@ -424,4 +434,8 @@ export function querySymbolTable(
 
 export function getAllSymbols(): VuexEntity[] {
   return [...symbolTable];
+}
+
+export function clearSymbolTable(): void {
+  symbolTable = [];
 }

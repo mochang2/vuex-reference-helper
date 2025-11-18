@@ -51,6 +51,9 @@ export async function getAst(file: vscode.Uri): Promise<AstResult | null> {
       plugins: ["typescript"],
       errorRecovery: true, // ignore minor syntax errors
     });
+    if (ast.errors && ast.errors.length > 0) {
+      throw new Error("ast has errors"); // return null if ast has errors
+    }
 
     const result = { ast, scriptStartLine };
     astCache.set(filePath, result);
