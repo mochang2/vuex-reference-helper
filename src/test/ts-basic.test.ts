@@ -37,7 +37,7 @@ suite("js basic", () => {
     edit.insert(targetFileUri, new vscode.Position(0, 0), "// test comment\n");
     await vscode.workspace.applyEdit(edit);
 
-    await sleep(200); // wait for event to be processed
+    await sleep(2200); // wait for the debounce and the event to be processed
 
     // then
     assert.ok(
