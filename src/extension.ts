@@ -5,6 +5,7 @@ import { VuexCompletionItemProvider } from "./VuexCompletionItemProvider";
 import { removeAst, clearAst } from "./ast";
 import { createDebounce } from "./util";
 
+let isBuildingSymbolTable = false; // to prevent multiple rebuilds at the same time
 let cancelRebuildDebounce: (() => void) | null = null;
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -37,11 +38,19 @@ export async function activate(context: vscode.ExtensionContext) {
   const { debounced: debouncedRebuild, cancel: cancelRebuild } = createDebounce(
     async () => {
       try {
+        if (isBuildingSymbolTable) {
+          return;
+        }
+
+        isBuildingSymbolTable = true;
+
         const result = await buildSymbolTable(); // rebuild symbol table
         vuexEntryUsageFiles = result.vuexEntryUsageFiles;
         moduleFiles = result.moduleFiles;
       } catch (error) {
         console.error("Error rebuilding symbol table:", error);
+      } finally {
+        isBuildingSymbolTable = false;
       }
     },
   );
