@@ -32,6 +32,13 @@ export class VuexDefinitionProvider implements vscode.DefinitionProvider {
       return null;
     }
 
+    const { useStoreLocalName, storeLocalName } = analyzeStoreContext(
+      astResult.ast
+    );
+    if (!useStoreLocalName || !storeLocalName) {
+      return null;
+    }
+
     const range = document.getWordRangeAtPosition(position);
     if (!range) {
       return null;
