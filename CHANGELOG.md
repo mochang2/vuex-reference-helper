@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.3] - 2025.11.18
+
+- Improve stability and performance.
+  - Strengthen error handling
+  - Prevent memory leaks
+
 ## [2.2.2] - 2025.10.08
 
 ### Added
