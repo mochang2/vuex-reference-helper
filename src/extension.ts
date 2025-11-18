@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { buildSymbolTable } from "./table";
+import { buildSymbolTable, clearSymbolTable } from "./table";
 import { VuexDefinitionProvider } from "./VuexDefinitionProvider";
 import { VuexCompletionItemProvider } from "./VuexCompletionItemProvider";
-import { removeAst } from "./ast";
+import { removeAst, clearAst } from "./ast";
 import { createDebounce } from "./util";
 
 let cancelRebuildDebounce: (() => void) | null = null;
@@ -66,4 +66,12 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(onDidChangeTextDocument);
 }
 
-export function deactivate() {}
+export function deactivate() {
+  // prevent memory leaks
+  if (cancelRebuildDebounce) {
+    cancelRebuildDebounce();
+    cancelRebuildDebounce = null;
+  }
+  clearSymbolTable();
+  clearAst();
+}
