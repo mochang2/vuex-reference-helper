@@ -13,11 +13,11 @@ It also supports **alias and path resolution**, making it easier to jump directl
 
 > 📷 Demo1 - Navigation
 
-![demo1](https://github.com/mochang2/vuex-reference-helper/blob/master/videos/navigation_demo.gif)
+![demo1](https://raw.githubusercontent.com/mochang2/vuex-reference-helper/master/videos/navigation_demo.gif)
 
 > 📷 Demo2 - Suggestion
 
-![demo2](https://github.com/mochang2/vuex-reference-helper/blob/master/videos/suggestion_demo.gif)
+![demo2](https://raw.githubusercontent.com/mochang2/vuex-reference-helper/master/videos/suggestion_demo.gif)
 
 ## Requirements
 
