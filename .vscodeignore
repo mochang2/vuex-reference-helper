@@ -1,7 +1,6 @@
 .vscode/**
 .github/**
 fixtures/**
-node_modules/**
 src/**
 out/test/**
 .gitignore
@@ -9,3 +8,6 @@ out/test/**
 **/eslint.config.mjs
 **/*.map
 **/*.ts
+**/vscode-test.mjs
+node_modules/**
+webpack.config.js
