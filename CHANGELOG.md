@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.4] - 2025.11.19
+
+- Remove unnecessary results(files) in build.
+
 ## [2.2.3] - 2025.11.18
 
 - Improve stability and performance.
