@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.6] - 2025.11.24
+
+- Re-enable the navigation of actions.
+
 ## [2.2.4] - 2025.11.19
 
 - Remove unnecessary results(files) in build.
